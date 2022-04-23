@@ -6,9 +6,14 @@ from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
 import motor.motor_asyncio
+import pymongo
 
 app = FastAPI()
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+#client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+
+mongo_url = os.environ["MONGODB_URL"]
+client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
+
 db = client.college
 
 
