@@ -14,7 +14,7 @@ app = FastAPI()
 mongo_url = os.environ["MONGODB_URL"]
 client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 
-db = client.college
+db = client.multimedia
 
 
 class PyObjectId(ObjectId):
@@ -33,12 +33,12 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class StudentModel(BaseModel):
+class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    email: EmailStr = Field(...)
-    course: str = Field(...)
-    gpa: float = Field(..., le=4.0)
+    artist: str = Field(...)
+    album: str = Field(...)
+    duration_seconds: float = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -46,83 +46,83 @@ class StudentModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
+                "name": "Cancion Animal",
+                "artist": "Soda Stereo",
+                "album": "Cancion Animal",
+                "duration_seconds": "120.0",
             }
         }
 
 
-class UpdateStudentModel(BaseModel):
+class UpdateSongModel(BaseModel):
     name: Optional[str]
-    email: Optional[EmailStr]
-    course: Optional[str]
-    gpa: Optional[float]
+    artist: Optional[str]
+    album: Optional[str]
+    duration_seconds: Optional[float]
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
+                "name": "Cancion Animal",
+                "artist": "Soda Stereo",
+                "album": "Cancion Animal",
+                "duration_seconds": "120.0",
             }
         }
 
 
-@app.post("/", response_description="Add new student", response_model=StudentModel)
-async def create_student(student: StudentModel = Body(...)):
-    student = jsonable_encoder(student)
-    new_student = await db["students"].insert_one(student)
-    created_student = await db["students"].find_one({"_id": new_student.inserted_id})
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_student)
+@app.post("/song/new", response_description="Add new song", response_model=SongModel)
+async def create_song(song: SongModel = Body(...)):
+    song = jsonable_encoder(song)
+    new_song = await db["songs"].insert_one(song)
+    created_song = await db["songs"].find_one({"_id": new_song.inserted_id})
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_song)
 
 
 @app.get(
-    "/", response_description="List all students", response_model=List[StudentModel]
+    "/song/list", response_description="List all songs", response_model=List[SongModel]
 )
-async def list_students():
-    students = await db["students"].find().to_list(1000)
-    return students
+async def list_songs():
+    songs = await db["songs"].find().to_list(1000)
+    return songs
 
 
 @app.get(
-    "/{id}", response_description="Get a single student", response_model=StudentModel
+    "/song/{id}", response_description="Get a single song", response_model=SongModel
 )
-async def show_student(id: str):
-    if (student := await db["students"].find_one({"_id": id})) is not None:
-        return student
+async def show_song(id: str):
+    if (song := await db["songs"].find_one({"_id": id})) is not None:
+        return song
 
-    raise HTTPException(status_code=404, detail=f"Student {id} not found")
+    raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
-@app.put("/{id}", response_description="Update a student", response_model=StudentModel)
-async def update_student(id: str, student: UpdateStudentModel = Body(...)):
-    student = {k: v for k, v in student.dict().items() if v is not None}
+@app.put("/song/{id}", response_description="Update a song", response_model=SongModel)
+async def update_song(id: str, song: UpdateSongModel = Body(...)):
+    song = {k: v for k, v in song.dict().items() if v is not None}
 
-    if len(student) >= 1:
-        update_result = await db["students"].update_one({"_id": id}, {"$set": student})
+    if len(song) >= 1:
+        update_result = await db["songs"].update_one({"_id": id}, {"$set": song})
 
         if update_result.modified_count == 1:
             if (
-                updated_student := await db["students"].find_one({"_id": id})
+                updated_song := await db["songs"].find_one({"_id": id})
             ) is not None:
-                return updated_student
+                return updated_song
 
-    if (existing_student := await db["students"].find_one({"_id": id})) is not None:
-        return existing_student
+    if (existing_song := await db["songs"].find_one({"_id": id})) is not None:
+        return existing_song
 
-    raise HTTPException(status_code=404, detail=f"Student {id} not found")
+    raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
-@app.delete("/{id}", response_description="Delete a student")
-async def delete_student(id: str):
-    delete_result = await db["students"].delete_one({"_id": id})
+@app.delete("/song/{id}", response_description="Delete a song")
+async def delete_song(id: str):
+    delete_result = await db["songs"].delete_one({"_id": id})
 
     if delete_result.deleted_count == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
-    raise HTTPException(status_code=404, detail=f"Student {id} not found")
+    raise HTTPException(status_code=404, detail=f"Song {id} not found")
