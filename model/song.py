@@ -1,11 +1,7 @@
 import os
 from pydantic import BaseModel, Field
 from bson import ObjectId
-from py_object_id import PyObjectId
-import enum
-
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
+from typing import Optional, List
 
 
 class PyObjectId(ObjectId):
