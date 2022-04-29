@@ -18,7 +18,7 @@ client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 db = client.multimedia
 
 
-@app.post("/song/new", response_description="Add new song", response_model=SongModel)
+@app.post("/songs", response_description="Add new song", response_model=SongModel)
 async def create_song(song: SongModel = Body(...)):
     song = jsonable_encoder(song)
     new_song = await db["songs"].insert_one(song)
@@ -27,7 +27,7 @@ async def create_song(song: SongModel = Body(...)):
 
 
 @app.get(
-    "/song/list", response_description="List all songs", response_model=List[SongModel]
+    "/songs", response_description="List all songs", response_model=List[SongModel]
 )
 async def list_songs():
     songs = await db["songs"].find().to_list(1000)
@@ -35,7 +35,7 @@ async def list_songs():
 
 
 @app.get(
-    "/song/{id}", response_description="Get a single song", response_model=SongModel
+    "/songs/{id}", response_description="Get a single song", response_model=SongModel
 )
 async def show_song(id: str):
     if (song := await db["songs"].find_one({"_id": id})) is not None:
@@ -44,7 +44,7 @@ async def show_song(id: str):
     raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
-@app.put("/song/{id}", response_description="Update a song", response_model=SongModel)
+@app.put("/songs/{id}", response_description="Update a song", response_model=SongModel)
 async def update_song(id: str, song: UpdateSongModel = Body(...)):
     song = {k: v for k, v in song.dict().items() if v is not None}
 
@@ -63,7 +63,7 @@ async def update_song(id: str, song: UpdateSongModel = Body(...)):
     raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
-@app.delete("/song/{id}", response_description="Delete a song")
+@app.delete("/songs/{id}", response_description="Delete a song")
 async def delete_song(id: str):
     delete_result = await db["songs"].delete_one({"_id": id})
 
