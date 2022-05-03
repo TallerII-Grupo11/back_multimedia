@@ -1,7 +1,9 @@
 import os
-from pydantic import BaseModel, Field
+
 from bson import ObjectId
-from typing import Optional, List
+from pydantic import Field
+from pydantic.main import BaseModel
+from typing import List, Optional
 
 
 class PyObjectId(ObjectId):
@@ -22,10 +24,11 @@ class PyObjectId(ObjectId):
 
 class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    title: str = Field(...)
     artist: str = Field(...)
     album: str = Field(...)
-    duration_seconds: float = Field(...)
+    description: str = Field(...)
+
 
     class Config:
         allow_population_by_field_name = True
@@ -36,25 +39,26 @@ class SongModel(BaseModel):
                 "name": "Cancion Animal",
                 "artist": "Soda Stereo",
                 "album": "Cancion Animal",
-                "duration_seconds": "120.0",
+                "description": "Animal"
             }
         }
 
 
 class UpdateSongModel(BaseModel):
-    name: Optional[str]
+    title: Optional[str]
     artist: Optional[str]
     album: Optional[str]
-    duration_seconds: Optional[float]
+    description: Optional[str]
+
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Cancion Animal",
+                "title": "Cancion Animal",
                 "artist": "Soda Stereo",
                 "album": "Cancion Animal",
-                "duration_seconds": "120.0",
+                "description": "Animal"
             }
         }

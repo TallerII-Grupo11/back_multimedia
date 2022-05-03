@@ -2,45 +2,30 @@ import uvicorn
 
 import logging.config
 
-from app.adapters.http.songs import songs_controller
-from fastapi import FastAPI
-
-from app.conf.config import Settings
-from app.conf.mongodb import MongoDB
-
-import os
-
-from fastapi import Body
-from fastapi import FastAPI
-from fastapi import HTTPException
-from fastapi import status
+from app.adapters import songs_controller
+from app.conf.config import Settings, get_settings
+from fastapi import Body, FastAPI, HTTPException, status
+from app.db import db
 
 
 logging.config.fileConfig('app/conf/logging.conf', disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
 
 settings = Settings()
 
-db = MongoDB()
+app = FastAPI(version=settings.version, title=settings.title)
 
-app = FastAPI(
-    version=settings.version, title=settings.title, description=settings.description
-)
-
-logger = logging.getLogger(__name__)
-
+app.include_router(songs_controller.router)
 
 @app.on_event("startup")
 async def startup():
-    logger.info("Startup APP")
+    await db.connect_to_database(path=settings.db_path)
 
 
 @app.on_event("shutdown")
 async def shutdown():
-    logger.info("Shutdown APP")
-
-
-app.include_router(songs_controller.router)
+    await db.close_database_connection()
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='0.0.0.0', port=settings.port)
+    uvicorn.run(app, host='0.0.0.0', port=settings.port,  reload=True)
