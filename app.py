@@ -7,7 +7,7 @@ from bson import ObjectId
 from typing import Optional, List
 import motor.motor_asyncio
 import pymongo
-from model.song import *
+from song import *
 
 app = FastAPI()
 #client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
@@ -63,7 +63,7 @@ async def update_song(id: str, song: UpdateSongModel = Body(...)):
     raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
-@app.delete("/songs/{id}", response_description="Delete a song")
+@app.delete("/songs/{id}", response_description="Delete a song", include_in_schema=False)
 async def delete_song(id: str):
     delete_result = await db["songs"].delete_one({"_id": id})
 
