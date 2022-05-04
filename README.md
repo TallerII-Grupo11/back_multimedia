@@ -1,17 +1,32 @@
 # back\_multimedia
 
+
+### Docker
+
 Run app commands local
 ```
-export MONGODB_URL="mongodb+srv://admin_user:<password>@multimedia.a0iq4.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-
-uvicorn app:app --reload
+docker build -t back-multimedia:0.1 .
+docker run -p 5000:5000 --env-file .env back-multimedia:0.1
 ```
 
-Deploy en Heroku
+### Manual Deploy to Heroku
+
 ```
-git push heroku main
-heroku logs --source app --tail
+heroku config:set port=5000
+heroku config:set version="1.0.0"
+heroku config:set title="Back_Multimedia"
+heroku config:set db_path="mongodb+srv://<user>:<pass>@multimedia.a0iq4.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 
-heroku config:set MONGO_URL="<url>"
+heroku container:push web -a spotifiuby-multimedia
+heroku container:release web -a spotifiuby-multimedia
 
+
+```
+
+### Test
+
+Run tests using [pytest](https://docs.pytest.org/en/6.2.x/)
+
+``` bash
+pytest tests/
 ```

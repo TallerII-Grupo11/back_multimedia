@@ -1,4 +1,4 @@
-from app.adapters.http import __version__
+from app.adapters import __version__
 
 
 def test_version():
