@@ -1,31 +1,17 @@
-from bson import ObjectId
+from app.db.model.py_object_id import PyObjectId
 from pydantic import Field
 from pydantic.main import BaseModel
 from typing import List, Optional
-
-
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+from bson import ObjectId
 
 
 class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
-    artist: str = Field(...)
-    album: str = Field(...)
+    artists: List[str] = Field(...)
+    album_id: str = Field(...)
     description: str = Field(...)
+    file: str = Field(...)
 
 
     class Config:
@@ -35,18 +21,20 @@ class SongModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Cancion Animal",
-                "artist": "Soda Stereo",
-                "album": "Cancion Animal",
-                "description": "Song"
+                "artists": ["Soda Stereo"],
+                "album_id": "album_id",
+                "description": "Song",
+                "file": "file_name"
             }
         }
 
 
 class UpdateSongModel(BaseModel):
     title: Optional[str]
-    artist: Optional[str]
-    album: Optional[str]
+    artists: Optional[List[str]]
+    album_id: Optional[str]
     description: Optional[str]
+    file: Optional[str]
 
 
     class Config:
@@ -55,8 +43,10 @@ class UpdateSongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artist": "Soda Stereo",
-                "album": "Cancion Animal",
-                "description": "Song"
+                "artists": ["Soda Stereo"],
+                "album_id": "album_id",
+                "description": "Song",
+                "file": "file_name"
+
             }
         }

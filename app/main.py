@@ -3,6 +3,7 @@ import uvicorn
 import logging.config
 
 from app.adapters import songs_controller
+from app.adapters import albums_controller
 from app.conf.config import Settings, get_settings
 from fastapi import Body, FastAPI, HTTPException, status
 from app.db import db
@@ -16,6 +17,7 @@ settings = Settings()
 app = FastAPI(version=settings.version, title=settings.title)
 
 app.include_router(songs_controller.router)
+app.include_router(albums_controller.router)
 
 @app.on_event("startup")
 async def startup():

@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from typing import List
 
-from app.db.models import SongModel, UpdateSongModel
+from app.db.model.song import SongModel, UpdateSongModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel
 from fastapi import Body
 
 
@@ -23,6 +24,7 @@ class DatabaseManager(object):
     async def close_database_connection(self):
         pass
 
+    # --- Songs ---
     @abstractmethod
     async def get_songs(self) -> List[UpdateSongModel]:
         pass
@@ -41,4 +43,25 @@ class DatabaseManager(object):
 
     @abstractmethod
     async def delete_song(self, song_id: str):
+        pass
+
+    # --- Albums ---
+    @abstractmethod
+    async def get_albums(self) -> List[UpdateAlbumModel]:
+        pass
+
+    @abstractmethod
+    async def get_album(self, album_id: str) -> AlbumModel:
+        pass
+
+    @abstractmethod
+    async def add_album(self, album: AlbumModel):
+        pass
+
+    @abstractmethod
+    async def update_album(self, album_id: str, album: UpdateAlbumModel):
+        pass
+
+    @abstractmethod
+    async def delete_album(self, album_id: str):
         pass

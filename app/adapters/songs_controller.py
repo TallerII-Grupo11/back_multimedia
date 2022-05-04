@@ -15,6 +15,7 @@ router = APIRouter(tags=["songs"])
 
 @router.post("/songs", 
 	response_description="Add new song", 
+	include_in_schema=False,
 	response_model=SongModel,
 )
 async def create_song(song: SongModel = Body(...), db: DatabaseManager = Depends(get_database)):
@@ -55,7 +56,6 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 async def update_song(id: str, song: UpdateSongModel = Body(...), db: DatabaseManager = Depends(get_database)):
 	song = await db.update_song(song_id=id, song=song)
 	return song
-	#raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
 @router.delete("/songs/{id}", 
