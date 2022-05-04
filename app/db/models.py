@@ -39,7 +39,7 @@ class SongModel(BaseModel):
                 "name": "Cancion Animal",
                 "artist": "Soda Stereo",
                 "album": "Cancion Animal",
-                "description": "Animal"
+                "description": "Song"
             }
         }
 
@@ -59,6 +59,6 @@ class UpdateSongModel(BaseModel):
                 "title": "Cancion Animal",
                 "artist": "Soda Stereo",
                 "album": "Cancion Animal",
-                "description": "Animal"
+                "description": "Song"
             }
         }

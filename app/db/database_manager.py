@@ -2,6 +2,8 @@ from abc import abstractmethod
 from typing import List
 
 from app.db.models import SongModel, UpdateSongModel
+from fastapi import Body
+
 
 
 class DatabaseManager(object):

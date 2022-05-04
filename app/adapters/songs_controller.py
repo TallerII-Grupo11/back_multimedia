@@ -1,7 +1,9 @@
 from fastapi import APIRouter, status, Depends, Body, HTTPException
+import logging
 
 from typing import Optional, List
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 from app.db import DatabaseManager, get_database
 from app.db.models import SongModel, UpdateSongModel
@@ -52,10 +54,8 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 )
 async def update_song(id: str, song: UpdateSongModel = Body(...), db: DatabaseManager = Depends(get_database)):
 	song = await db.update_song(song_id=id, song=song)
-	if song is not None: 
-		return song
-
-	raise HTTPException(status_code=404, detail=f"Song {id} not found")
+	return song
+	#raise HTTPException(status_code=404, detail=f"Song {id} not found")
 
 
 @router.delete("/songs/{id}", 
