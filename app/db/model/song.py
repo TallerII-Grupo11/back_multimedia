@@ -1,5 +1,6 @@
 from app.db.model.py_object_id import PyObjectId
 from pydantic import Field
+
 from pydantic.main import BaseModel
 from typing import List, Optional
 from bson import ObjectId
@@ -11,7 +12,7 @@ class SongModel(BaseModel):
     artists: List[str] = Field(...)
     album_id: str = Field(...)
     description: str = Field(...)
-    file: str = Field(...)
+    music_file: str = Field(...)
 
 
     class Config:
@@ -20,11 +21,11 @@ class SongModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Cancion Animal",
+                "title": "Cancion Animal",
                 "artists": ["Soda Stereo"],
                 "album_id": "album_id",
                 "description": "Song",
-                "file": "file_name"
+                "music_file": "file_name"
             }
         }
 
@@ -34,8 +35,7 @@ class UpdateSongModel(BaseModel):
     artists: Optional[List[str]]
     album_id: Optional[str]
     description: Optional[str]
-    file: Optional[str]
-
+    music_file: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -46,7 +46,6 @@ class UpdateSongModel(BaseModel):
                 "artists": ["Soda Stereo"],
                 "album_id": "album_id",
                 "description": "Song",
-                "file": "file_name"
-
+                "music_file": "file_name"
             }
         }

@@ -1,17 +1,12 @@
 from fastapi import APIRouter, status, Depends, Body, HTTPException
-import logging
 
 from typing import Optional, List
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 
 from app.db import DatabaseManager, get_database
 from app.db.model.album import AlbumModel, UpdateAlbumModel
 
-
-
 router = APIRouter(tags=["albums"])
-
 
 @router.post("/albums", 
 	response_description="Add new album", 
@@ -40,7 +35,7 @@ async def list_albums(db: DatabaseManager = Depends(get_database)):
 	status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
-	album = await db.get_song(album_id=id)
+	album = await db.get_album(album_id=id)
 	if album is not None: 
 		return album 
 
@@ -50,14 +45,11 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
 @router.put("/albums/{id}", 
 	response_description="Update a album",
 	response_model=AlbumModel,
-	include_in_schema=False,
 	status_code=status.HTTP_200_OK,
 )
 async def update_album(id: str, album: UpdateAlbumModel = Body(...), db: DatabaseManager = Depends(get_database)):
 	album = await db.update_album(album_id=id, album=album)
 	return album
-	#raise HTTPException(status_code=404, detail=f"Album {id} not found")
-
 
 @router.delete("/albums/{id}", 
 	response_description="Delete a album", 

@@ -38,7 +38,7 @@ class MongoManager(DatabaseManager):
 
     async def get_song(self, song_id: str) -> SongModel:
         song = await self.db["songs"].find_one({"_id": song_id})
-        return song
+        return SongModel(**song)
 
     async def delete_song(self, song_id: str):
         delete_result = await self.db["songs"].delete_one({"_id": song_id})
@@ -53,6 +53,7 @@ class MongoManager(DatabaseManager):
     async def add_song(self, song: SongModel = Body(...)):
         song = jsonable_encoder(song)
         await self.db["songs"].insert_one(song)
+        return song
 
     # --- ALBUM ---
     async def get_albums(self) -> List[UpdateAlbumModel]:
@@ -79,3 +80,4 @@ class MongoManager(DatabaseManager):
     async def add_album(self, album: AlbumModel = Body(...)):
         album = jsonable_encoder(album)
         await self.db["albums"].insert_one(album)
+        return album
