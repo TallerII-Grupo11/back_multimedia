@@ -9,11 +9,11 @@ router = APIRouter(tags=["songs"])
 
 @router.post("/songs",
     response_description="Add new song",
-    response_model=SongModel,
-)
+    response_model=SongModel
+    )
 async def create_song(
     song: SongModel = Body(...), db: DatabaseManager = Depends(get_database)
-):
+    ):
     created_song = await db.add_song(song)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_song)
 
@@ -22,7 +22,7 @@ async def create_song(
     response_description="List all songs",
     response_model=List[SongModel],
     status_code=status.HTTP_200_OK,
-)
+    )
 async def list_songs(db: DatabaseManager = Depends(get_database)):
     songs = await db.get_songs()
     return songs
@@ -32,7 +32,7 @@ async def list_songs(db: DatabaseManager = Depends(get_database)):
     response_description="Get a single song",
     response_model=SongModel,
     status_code=status.HTTP_200_OK,
-)
+    )
 async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
     song = await db.get_song(song_id=id)
     if song is not None: 
@@ -45,10 +45,10 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
     response_description="Update a song",
     response_model=SongModel,
     status_code=status.HTTP_200_OK,
-)
+    )
 async def update_song(id: str, song: UpdateSongModel = Body(...), 
     db: DatabaseManager = Depends(get_database)
-):
+    ):
     song = await db.update_song(song_id=id, song=song)
     return song
 
@@ -56,7 +56,7 @@ async def update_song(id: str, song: UpdateSongModel = Body(...),
     response_description="Delete a song",
     include_in_schema=False,
     status_code=status.HTTP_200_OK,
-)
+    )
 async def delete_song(id: str, db: DatabaseManager = Depends(get_database)):
     delete_result = await db.delete_song(song_id=id)
 
