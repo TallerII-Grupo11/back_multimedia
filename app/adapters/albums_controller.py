@@ -61,6 +61,7 @@ async def update_album(
     album = await db.update_album(album_id=id, album=album)
     return album
 
+
 @router.delete(
     "/albums/{id}",
     response_description="Delete a album",
