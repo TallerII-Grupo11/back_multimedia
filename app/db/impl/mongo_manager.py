@@ -9,6 +9,7 @@ from app.db.model.album import AlbumModel, UpdateAlbumModel
 from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
+
 class MongoManager(DatabaseManager):
     client: AsyncIOMotorClient = None
     db: AsyncIOMotorDatabase = None
@@ -44,7 +45,7 @@ class MongoManager(DatabaseManager):
         delete_result = await self.db["songs"].delete_one({"_id": song_id})
         return delete_result
 
-    async def update_song(self, song_id: str, song: UpdateSongModel =  Body(...)):
+    async def update_song(self, song_id: str, song: UpdateSongModel = Body(...)):
         song = {k: v for k, v in song.dict().items() if v is not None}
 
         if len(song) >= 1:
@@ -71,7 +72,7 @@ class MongoManager(DatabaseManager):
         delete_result = await self.db["albums"].delete_one({"_id": album_id})
         return delete_result
 
-    async def update_album(self, album_id: str, album: UpdateAlbumModel =  Body(...)):
+    async def update_album(self, album_id: str, album: UpdateAlbumModel = Body(...)):
         album = {k: v for k, v in album.dict().items() if v is not None}
 
         if len(album) >= 1:

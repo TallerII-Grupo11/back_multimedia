@@ -4,6 +4,7 @@ from typing import List
 from app.db.model.song import SongModel, UpdateSongModel
 from app.db.model.album import AlbumModel, UpdateAlbumModel
 
+
 class DatabaseManager(object):
     @property
     def client(self):

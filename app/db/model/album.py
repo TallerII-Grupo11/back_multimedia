@@ -16,7 +16,6 @@ class AlbumModel(BaseModel):
     suscriptions: List[str] = Field(...)
     songs: List[SongModel] = Field(...)
 
-
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
@@ -48,7 +47,6 @@ class UpdateAlbumModel(BaseModel):
     images: Optional[List[str]]
     suscriptions: Optional[List[str]]
     songs: Optional[List[SongModel]]
-
 
     class Config:
         arbitrary_types_allowed = True
