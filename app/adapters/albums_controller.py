@@ -15,7 +15,7 @@ router = APIRouter(tags=["albums"])
     response_model=AlbumModel,
 )
 async def create_album(
-    album: AlbumModel = Body(...), 
+    album: AlbumModel = Body(...),
     db: DatabaseManager = Depends(get_database)
 ):
     created_album = await db.add_album(album)
@@ -41,8 +41,8 @@ async def list_albums(db: DatabaseManager = Depends(get_database)):
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
     album = await db.get_album(album_id=id)
-    if album is not None: 
-        return album 
+    if album is not None:
+        return album
 
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
 
@@ -53,7 +53,11 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
     response_model=AlbumModel,
     status_code=status.HTTP_200_OK,
 )
-async def update_album(id: str, album: UpdateAlbumModel = Body(...), db: DatabaseManager = Depends(get_database)):
+async def update_album(
+    id: str,
+    album: UpdateAlbumModel = Body(...),
+    db: DatabaseManager = Depends(get_database)
+):
     album = await db.update_album(album_id=id, album=album)
     return album
 
