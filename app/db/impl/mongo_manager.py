@@ -1,7 +1,6 @@
 import logging
 from typing import List
 
-from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.db import DatabaseManager
@@ -9,8 +8,6 @@ from app.db.model.song import SongModel, UpdateSongModel
 from app.db.model.album import AlbumModel, UpdateAlbumModel
 from fastapi import Body
 from fastapi.encoders import jsonable_encoder
-
-
 
 class MongoManager(DatabaseManager):
     client: AsyncIOMotorClient = None
@@ -30,7 +27,6 @@ class MongoManager(DatabaseManager):
         logging.info("Closing connection with MongoDB.")
         self.client.close()
         logging.info("Closed connection with MongoDB.")
-
 
     # --- SONG ---
     async def get_songs(self) -> List[UpdateSongModel]:
@@ -79,8 +75,6 @@ class MongoManager(DatabaseManager):
 
         if len(album) >= 1:
             await self.db["albums"].update_one({"_id": album_id}, {"$set": album})
-
-            
 
     async def add_album(self, album: AlbumModel = Body(...)):
         album = jsonable_encoder(album)

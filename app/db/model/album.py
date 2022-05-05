@@ -1,5 +1,7 @@
 from app.db.model.py_object_id import PyObjectId
 from pydantic import Field
+from pydantic import UrlStr
+
 from pydantic.main import BaseModel
 from typing import List, Optional
 from bson import ObjectId
@@ -11,7 +13,7 @@ class AlbumModel(BaseModel):
     title: str = Field(...)
     description: str = Field(...)
     genre: str = Field(...)
-    images: List[str] = Field(...)
+    images: List[UrlStr] = Field(...)
     suscriptions: List[str] = Field(...)
     songs: List[SongModel] = Field(...)
 
@@ -44,7 +46,7 @@ class UpdateAlbumModel(BaseModel):
     title: Optional[str]
     description: Optional[str]
     genre: Optional[str]
-    images: Optional[List[str]]
+    images: Optional[List[UrlStr]]
     suscriptions: Optional[List[str]]
     songs: Optional[List[SongModel]]
 

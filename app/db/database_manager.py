@@ -3,9 +3,6 @@ from typing import List
 
 from app.db.model.song import SongModel, UpdateSongModel
 from app.db.model.album import AlbumModel, UpdateAlbumModel
-from fastapi import Body
-
-
 
 class DatabaseManager(object):
     @property
