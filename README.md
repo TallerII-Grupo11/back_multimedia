@@ -1,6 +1,6 @@
 # back\_multimedia
 
-[![codecov](https://codecov.io/gh/TallerII-Grupo11/back_multimedia/branch/main/graph/badge.svg?token=X5YSLG3P2G)](https://codecov.io/gh/TallerII-Grupo11/back_multimedia)
+[![codecov](https://codecov.io/gh/TallerII-Grupo11/back_multimedia/branch/main/graph/badge.svg?token=5CIK0SM2UN)](https://codecov.io/gh/TallerII-Grupo11/back_multimedia)
 [![Linters](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/linter.yaml/badge.svg)](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/linter.yaml)
 [![Tests](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/test.yaml/badge.svg)](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/test.yaml)
 [![Deploy](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/deploy.yaml/badge.svg)](https://github.com/TallerII-Grupo11/back_multimedia/actions/workflows/deploy.yaml)
