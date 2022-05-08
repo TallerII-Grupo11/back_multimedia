@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
@@ -72,15 +72,14 @@ class MongoManager(DatabaseManager):
             songs_list.append(song)
 
         album_w_song = {"songs": songs_list,
-            "artist": album["artist"],
-            "title": album["title"],
-            "description": album["description"],
-            "genre": album["genre"],
-            "subscription": album["subscription"],
-            "images": album["images"]
-            }
+                        "artist": album["artist"],
+                        "title": album["title"],
+                        "description": album["description"],
+                        "genre": album["genre"],
+                        "subscription": album["subscription"],
+                        "images": album["images"]
+        }
         return AlbumSongModel.parse_obj(album_w_song)
-
 
     async def get_albums(self) -> List[UpdateAlbumModel]:
         albums_list = []
@@ -118,11 +117,14 @@ class MongoManager(DatabaseManager):
             albums_list.append(alb)
         return albums_list
 
-    async def get_albums_by_subscription(self, subscription: str) -> List[UpdateAlbumModel]:
+    async def get_albums_by_subscription(
+        self, 
+        subscription: str
+    ) -> List[UpdateAlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find(
             {"subscription": 
-                { "$in": Subscription.get_allowed(subscription) } 
+                {"$in": Subscription.get_allowed(subscription)} 
             }
         )
         async for album in albums_q:

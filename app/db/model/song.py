@@ -10,7 +10,7 @@ class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
     artists: List[str] = Field(...)
-    album_id: str = None # Field(...)
+    album_id: str = None
     description: str = Field(...)
     music_file: str = Field(...)
 

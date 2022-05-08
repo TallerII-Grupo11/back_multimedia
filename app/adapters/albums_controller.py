@@ -83,9 +83,13 @@ async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
     response_model=List[UpdateAlbumModel],
     status_code=status.HTTP_200_OK,
 )
-async def list_albums_by_subscription(subscription: str, db: DatabaseManager = Depends(get_database)):
+async def list_albums_by_subscription(
+    subscription: str, 
+    db: DatabaseManager = Depends(get_database)
+):
     albums = await db.get_albums_by_subscription(subscription)
     return albums
+
 
 @router.get(
     "/albums/artist/{artist}",
