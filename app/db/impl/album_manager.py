@@ -54,6 +54,13 @@ class AlbumManager():
         album = {k: v for k, v in album.dict().items() if v is not None}
 
         if len(album) >= 1:
+            if "songs" in album:
+                list_songs = album["songs"]
+                for song in list_songs:
+                    await self.db["albums"].update_one({"_id": album_id}, {"$push": song})
+
+                del album["songs"]
+
             await self.db["albums"].update_one({"_id": album_id}, {"$set": album})
 
     async def add_album(self, album: AlbumModel = Body(...)):
