@@ -78,7 +78,7 @@ class MongoManager(DatabaseManager):
                         "genre": album["genre"],
                         "subscription": album["subscription"],
                         "images": album["images"]
-                    }
+                        }
         return AlbumSongModel.parse_obj(album_w_song)
 
     async def get_albums(self) -> List[UpdateAlbumModel]:
@@ -123,9 +123,8 @@ class MongoManager(DatabaseManager):
     ) -> List[UpdateAlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find(
-            {"subscription":
-                {"$in": Subscription.get_allowed(subscription)}
-        })
+            {"subscription": {"$in": Subscription.get_allowed(subscription)}}
+        )
         async for album in albums_q:
             albums_list.append(AlbumModel(**album))
         return albums_list

@@ -74,7 +74,7 @@ class DatabaseManager(object):
 
     @abstractmethod
     async def get_albums_by_subscription(
-        self, 
+        self,
         subscription: str
     ) -> List[UpdateAlbumModel]:
         pass
