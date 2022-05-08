@@ -54,7 +54,10 @@ class AlbumManager():
             if "songs" in album:
                 list_songs = album["songs"]
                 for song in list_songs:
-                    await self.db["albums"].update_one({"_id": album_id}, {"$push": song})
+                    await self.db["albums"].update_one(
+                                                        {"_id": album_id},
+                                                        {"$push": song}
+                                                      )
 
                 del album["songs"]
 

@@ -19,7 +19,7 @@ class PlaylistManager():
             song = await self.song_manager.get_song(song_id)
             songs_list.append(song)
 
-        playlist_w_song = { "songs": songs_list,
+        playlist_w_song = {"songs": songs_list,
                             "title": playlist["title"],
                             "description": playlist["description"],
                             "is_collaborative": playlist["is_collaborative"],
@@ -57,9 +57,10 @@ class PlaylistManager():
         playlist_to_update = await self.get_playlist(playlist_id)
         playlist_to_update = jsonable_encoder(playlist_to_update)
 
-        if not (playlist["user_owner"] == playlist_to_update["user_owner"] or \
-            playlist_to_update["is_collaborative"] == "yes"):
-            raise RuntimeError(f"User {playlist['user_owner']} cant not edit Playlist {playlist_id}")
+        if not (playlist["user_owner"] == playlist_to_update["user_owner"] or
+                playlist_to_update["is_collaborative"] == "yes"):
+            raise RuntimeError(f"User {playlist['user_owner']} \
+                cant not edit Playlist {playlist_id}")
 
         if len(playlist) >= 1:
             if "songs" in playlist:
@@ -71,7 +72,10 @@ class PlaylistManager():
                         )
 
                 del playlist["songs"]
-            await self.db["playlists"].update_one({"_id": playlist_id}, {"$set": playlist})
+            await self.db["playlists"].update_one(
+                                                    {"_id": playlist_id},
+                                                    {"$set": playlist}
+                                                 )
 
     async def add_playlist(self, playlist: PlaylistModel = Body(...)):
         playlist = jsonable_encoder(playlist)
