@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, Depends, Body, HTTPException
-from typing import List
 from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.model.song import SongModel, UpdateSongModel
+from typing import List, Optional
 
 router = APIRouter(tags=["songs"])
 
@@ -22,18 +22,31 @@ async def create_song(
 
 @router.get(
     "/songs",
-    response_description="List all songs",
+    response_description="List all songs without album",
+    include_in_schema=False,
     response_model=List[SongModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_songs(db: DatabaseManager = Depends(get_database)):
-    songs = await db.get_songs()
+    songs = await db.list_songs_by_album()
+    return songs
+
+
+@router.get(
+    "/songs/album/{album_id}",
+    response_description="List all songs in album",
+    response_model=List[SongModel],
+    status_code=status.HTTP_200_OK,
+)
+async def list_songs_in_album(album_id: Optional[str] = None, db: DatabaseManager = Depends(get_database)):
+    songs = await db.list_songs_by_album(album_id)
     return songs
 
 
 @router.get(
     "/songs/{id}",
     response_description="Get a single song",
+    include_in_schema=False,
     response_model=SongModel,
     status_code=status.HTTP_200_OK,
 )
@@ -47,7 +60,7 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 
 @router.put(
     "/songs/{id}",
-    response_description="Update a song",
+    response_description="Update a song album",
     response_model=SongModel,
     status_code=status.HTTP_200_OK,
 )

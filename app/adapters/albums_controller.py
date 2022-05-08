@@ -4,7 +4,7 @@ from typing import List
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.album import AlbumModel, UpdateAlbumModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
 
 router = APIRouter(tags=["albums"])
 
@@ -36,7 +36,7 @@ async def list_albums(db: DatabaseManager = Depends(get_database)):
 @router.get(
     "/albums/{id}",
     response_description="Get a single album",
-    response_model=AlbumModel,
+    response_model=AlbumSongModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
@@ -75,3 +75,24 @@ async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
+
+
+@router.get(
+    "/albums/subscription/{subscription}",
+    response_description="List all albums by subscription",
+    response_model=List[UpdateAlbumModel],
+    status_code=status.HTTP_200_OK,
+)
+async def list_albums_by_subscription(subscription: str, db: DatabaseManager = Depends(get_database)):
+    albums = await db.get_albums_by_subscription(subscription)
+    return albums
+
+@router.get(
+    "/albums/artist/{artist}",
+    response_description="List all albums by artist",
+    response_model=List[AlbumSongModel],
+    status_code=status.HTTP_200_OK,
+)
+async def list_albums_by_artist(artist: str, db: DatabaseManager = Depends(get_database)):
+    albums = await db.get_albums_by_artist(artist)
+    return albums

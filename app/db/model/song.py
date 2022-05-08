@@ -10,11 +10,12 @@ class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
     artists: List[str] = Field(...)
-    album_id: str = Field(...)
+    album_id: str = None # Field(...)
     description: str = Field(...)
     music_file: str = Field(...)
 
     class Config:
+        orm_mode = True
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}

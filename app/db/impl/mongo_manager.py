@@ -1,11 +1,12 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.db import DatabaseManager
 from app.db.model.song import SongModel, UpdateSongModel
-from app.db.model.album import AlbumModel, UpdateAlbumModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
+from app.db.model.subscription import Subscription
 from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
@@ -56,7 +57,31 @@ class MongoManager(DatabaseManager):
         await self.db["songs"].insert_one(song)
         return song
 
+    async def list_songs_by_album(self, album_id: str = None) -> List[UpdateSongModel]:
+        songs_list = []
+        songs_q = self.db["songs"].find({"album_id": album_id})
+        async for song in songs_q:
+            songs_list.append(SongModel(**song))
+        return songs_list
+
     # --- ALBUM ---
+    async def with_songs(self, album: AlbumModel):
+        songs_list = []
+        for song_id in album["songs"]:
+            song = await self.get_song(song_id)
+            songs_list.append(song)
+
+        album_w_song = {"songs": songs_list,
+            "artist": album["artist"],
+            "title": album["title"],
+            "description": album["description"],
+            "genre": album["genre"],
+            "subscription": album["subscription"],
+            "images": album["images"]
+            }
+        return AlbumSongModel.parse_obj(album_w_song)
+
+
     async def get_albums(self) -> List[UpdateAlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find()
@@ -64,9 +89,11 @@ class MongoManager(DatabaseManager):
             albums_list.append(AlbumModel(**album))
         return albums_list
 
-    async def get_album(self, album_id: str) -> AlbumModel:
+    async def get_album(self, album_id: str) -> AlbumSongModel:
         album = await self.db["albums"].find_one({"_id": album_id})
-        return album
+        album_w_song = await self.with_songs(album)
+
+        return album_w_song
 
     async def delete_album(self, album_id: str):
         delete_result = await self.db["albums"].delete_one({"_id": album_id})
@@ -82,3 +109,22 @@ class MongoManager(DatabaseManager):
         album = jsonable_encoder(album)
         await self.db["albums"].insert_one(album)
         return album
+
+    async def get_albums_by_artist(self, artist: str) -> List[AlbumSongModel]:
+        albums_list = []
+        albums_q = self.db["albums"].find({"artist": artist})
+        async for album in albums_q:
+            alb = await self.with_songs(album)
+            albums_list.append(alb)
+        return albums_list
+
+    async def get_albums_by_subscription(self, subscription: str) -> List[UpdateAlbumModel]:
+        albums_list = []
+        albums_q = self.db["albums"].find(
+            {"subscription": 
+                { "$in": Subscription.get_allowed(subscription) } 
+            }
+        )
+        async for album in albums_q:
+            albums_list.append(AlbumModel(**album))
+        return albums_list
