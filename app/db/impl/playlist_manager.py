@@ -1,10 +1,7 @@
-import logging
 from typing import List
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.db import DatabaseManager
-from app.db.model.song import SongModel, UpdateSongModel
 from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel, PlaylistSongModel
 from app.db.impl.song_manager import SongManager
 from fastapi import Body
@@ -22,12 +19,12 @@ class PlaylistManager():
             song = await self.song_manager.get_song(song_id)
             songs_list.append(song)
 
-        playlist_w_song = {"songs": songs_list,
-                        "title": playlist["title"],
-                        "description": playlist["description"],
-                        "is_collaborative": playlist["is_collaborative"],
-                        "user_owner": playlist["user_owner"]
-                        }
+        playlist_w_song = { "songs": songs_list,
+                            "title": playlist["title"],
+                            "description": playlist["description"],
+                            "is_collaborative": playlist["is_collaborative"],
+                            "user_owner": playlist["user_owner"]
+                            }
         return PlaylistSongModel.parse_obj(playlist_w_song)
 
     async def get_playlists(self, user_id: str = None) -> List[PlaylistSongModel]:
@@ -52,31 +49,29 @@ class PlaylistManager():
         return delete_result
 
     async def update_playlist(
-        self, 
-        playlist_id: str, 
+        self,
+        playlist_id: str,
         playlist: UpdatePlaylistModel = Body(...)
     ):
         playlist = {k: v for k, v in playlist.dict().items() if v is not None}
         playlist_to_update = await self.get_playlist(playlist_id)
         playlist_to_update = jsonable_encoder(playlist_to_update)
-        
-        if playlist["user_owner"] == playlist_to_update["user_owner"] or \
-            playlist_to_update["is_collaborative"] == "yes":
 
+        if not (playlist["user_owner"] == playlist_to_update["user_owner"] or \
+            playlist_to_update["is_collaborative"] == "yes"):
+            raise RuntimeError(f"User {playlist['user_owner']} cant not edit Playlist {playlist_id}")
 
-            if len(playlist) >= 1:
-                if "songs" in playlist:
-                    list_songs = playlist["songs"]
-                    for song in list_songs:
-                        await self.db["playlists"].update_one({"_id": playlist_id}, 
-                            {"$push": {"songs": {"$each": playlist["songs"]}}})
+        if len(playlist) >= 1:
+            if "songs" in playlist:
+                list_songs = playlist["songs"]
+                for song in list_songs:
+                    await self.db["playlists"].update_one(
+                        {"_id": playlist_id},
+                        {"$push": {"songs": {"$each": playlist["songs"]}}}
+                        )
 
-                    del playlist["songs"]
-
-                await self.db["playlists"].update_one({"_id": playlist_id}, {"$set": playlist})
-
-        else:
-            raise RuntimeError(f"User {user_id} cant not edit Playlist {playlist_id}")
+                del playlist["songs"]
+            await self.db["playlists"].update_one({"_id": playlist_id}, {"$set": playlist})
 
     async def add_playlist(self, playlist: PlaylistModel = Body(...)):
         playlist = jsonable_encoder(playlist)

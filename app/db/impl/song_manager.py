@@ -1,12 +1,8 @@
-import logging
 from typing import List
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.db import DatabaseManager
 from app.db.model.song import SongModel, UpdateSongModel
-from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
-from app.db.model.subscription import Subscription
 from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
@@ -22,12 +18,12 @@ class SongManager():
             songs_list.append(SongModel(**song))
         return songs_list
 
-    async def get_song(self,song_id: str) -> SongModel:
+    async def get_song(self, song_id: str) -> SongModel:
         song = await self.db["songs"].find_one({"_id": song_id})
         return SongModel(**song)
 
     async def delete_song(self, song_id: str):
-        delete_result = await selfdb["songs"].delete_one({"_id": song_id})
+        delete_result = await self.db["songs"].delete_one({"_id": song_id})
         return delete_result
 
     async def update_song(self, song_id: str, song: UpdateSongModel = Body(...)):

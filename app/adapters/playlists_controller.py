@@ -32,8 +32,9 @@ async def create_playlist(
     status_code=status.HTTP_200_OK,
 )
 async def list_playlists(
-    user_id: str = None, 
-    db: DatabaseManager = Depends(get_database)):
+    user_id: str = None,
+    db: DatabaseManager = Depends(get_database)
+):
     manager = PlaylistManager(db.db)
     if user_id:
         return await manager.get_playlists(user_id)

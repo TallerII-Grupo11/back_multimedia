@@ -55,7 +55,7 @@ class PlaylistSongModel(BaseModel):
     title: Optional[str]
     description: Optional[str]
     songs: Optional[List[SongModel]]
-    is_collaborative: Optional[str ]
+    is_collaborative: Optional[str]
     user_owner: Optional[str]
 
     class Config:

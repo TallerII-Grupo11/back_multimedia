@@ -1,8 +1,4 @@
 from abc import abstractmethod
-from typing import List
-
-from app.db.model.song import SongModel, UpdateSongModel
-from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
 
 
 class DatabaseManager(object):

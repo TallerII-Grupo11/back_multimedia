@@ -1,14 +1,7 @@
 import logging
-from typing import List
-
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.db import DatabaseManager
-from app.db.model.song import SongModel, UpdateSongModel
-from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
-from app.db.model.subscription import Subscription
-from fastapi import Body
-from fastapi.encoders import jsonable_encoder
 
 
 class MongoManager(DatabaseManager):

@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.impl.song_manager import SongManager
 from app.db.model.song import SongModel, UpdateSongModel
-from typing import List, Optional
+from typing import List
 
 router = APIRouter(tags=["songs"])
 
