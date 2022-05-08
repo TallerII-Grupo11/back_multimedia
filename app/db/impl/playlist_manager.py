@@ -20,11 +20,11 @@ class PlaylistManager():
             songs_list.append(song)
 
         playlist_w_song = {"songs": songs_list,
-                            "title": playlist["title"],
-                            "description": playlist["description"],
-                            "is_collaborative": playlist["is_collaborative"],
-                            "user_owner": playlist["user_owner"]
-                            }
+                           "title": playlist["title"],
+                           "description": playlist["description"],
+                           "is_collaborative": playlist["is_collaborative"],
+                           "user_owner": playlist["user_owner"]
+                          }
         return PlaylistSongModel.parse_obj(playlist_w_song)
 
     async def get_playlists(self, user_id: str = None) -> List[PlaylistSongModel]:
