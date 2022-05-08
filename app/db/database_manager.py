@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List
 
 from app.db.model.song import SongModel, UpdateSongModel
-from app.db.model.album import AlbumModel, UpdateAlbumModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
 
 
 class DatabaseManager(object):
@@ -43,13 +43,17 @@ class DatabaseManager(object):
     async def delete_song(self, song_id: str):
         pass
 
+    @abstractmethod
+    async def list_songs_in_album(self, album_id: str) -> List[UpdateSongModel]:
+        pass
+
     # --- Albums ---
     @abstractmethod
     async def get_albums(self) -> List[UpdateAlbumModel]:
         pass
 
     @abstractmethod
-    async def get_album(self, album_id: str) -> AlbumModel:
+    async def get_album(self, album_id: str) -> AlbumSongModel:
         pass
 
     @abstractmethod
@@ -62,4 +66,15 @@ class DatabaseManager(object):
 
     @abstractmethod
     async def delete_album(self, album_id: str):
+        pass
+
+    @abstractmethod
+    async def get_albums_by_artist(self, artist: str) -> List[AlbumSongModel]:
+        pass
+
+    @abstractmethod
+    async def get_albums_by_subscription(
+        self,
+        subscription: str
+    ) -> List[UpdateAlbumModel]:
         pass
