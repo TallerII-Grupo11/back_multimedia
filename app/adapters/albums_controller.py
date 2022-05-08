@@ -84,7 +84,7 @@ async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
     status_code=status.HTTP_200_OK,
 )
 async def list_albums_by_subscription(
-    subscription: str, 
+    subscription: str,
     db: DatabaseManager = Depends(get_database)
 ):
     albums = await db.get_albums_by_subscription(subscription)
@@ -97,6 +97,9 @@ async def list_albums_by_subscription(
     response_model=List[AlbumSongModel],
     status_code=status.HTTP_200_OK,
 )
-async def list_albums_by_artist(artist: str, db: DatabaseManager = Depends(get_database)):
+async def list_albums_by_artist(
+    artist: str,
+    db: DatabaseManager = Depends(get_database)
+):
     albums = await db.get_albums_by_artist(artist)
     return albums

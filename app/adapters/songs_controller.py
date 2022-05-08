@@ -39,7 +39,7 @@ async def list_songs(db: DatabaseManager = Depends(get_database)):
     status_code=status.HTTP_200_OK,
 )
 async def list_songs_in_album(
-    album_id: Optional[str] = None, 
+    album_id: Optional[str] = None,
     db: DatabaseManager = Depends(get_database)
 ):
     songs = await db.list_songs_by_album(album_id)
