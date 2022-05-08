@@ -42,7 +42,7 @@ class UpdateAlbumModel(BaseModel):
     artist: Optional[str]
     genre: Optional[Genre]
     images: Optional[List[str]]
-    subscription: Optional[str]
+    subscription: Optional[Subscription]
     songs: Optional[List[str]]
 
     class Config:
