@@ -5,6 +5,8 @@ from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
 from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
+from app.db.impl.album_manager import AlbumManager
+
 
 router = APIRouter(tags=["albums"])
 
@@ -18,7 +20,8 @@ async def create_album(
     album: AlbumModel = Body(...),
     db: DatabaseManager = Depends(get_database)
 ):
-    created_album = await db.add_album(album)
+    manager = AlbumManager(db.db)
+    created_album = await manager.add_album(album)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_album)
 
 
@@ -29,7 +32,8 @@ async def create_album(
     status_code=status.HTTP_200_OK,
 )
 async def list_albums(db: DatabaseManager = Depends(get_database)):
-    albums = await db.get_albums()
+    manager = AlbumManager(db.db)
+    albums = await manager.get_albums()
     return albums
 
 
@@ -40,7 +44,8 @@ async def list_albums(db: DatabaseManager = Depends(get_database)):
     status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
-    album = await db.get_album(album_id=id)
+    manager = AlbumManager(db.db)
+    album = await manager.get_album(album_id=id)
     if album is not None:
         return album
 
@@ -58,7 +63,8 @@ async def update_album(
     album: UpdateAlbumModel = Body(...),
     db: DatabaseManager = Depends(get_database)
 ):
-    album = await db.update_album(album_id=id, album=album)
+    manager = AlbumManager(db.db)
+    album = await manager.update_album(album_id=id, album=album)
     return album
 
 
@@ -69,7 +75,8 @@ async def update_album(
     status_code=status.HTTP_200_OK,
 )
 async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
-    delete_result = await db.delete_album(album_id=id)
+    manager = AlbumManager(db.db)
+    delete_result = await manager.delete_album(album_id=id)
 
     if delete_result.deleted_count == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
@@ -78,28 +85,22 @@ async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
 
 
 @router.get(
-    "/albums/subscription/{subscription}",
+    "/albums/",
     response_description="List all albums by subscription",
-    response_model=List[UpdateAlbumModel],
-    status_code=status.HTTP_200_OK,
-)
-async def list_albums_by_subscription(
-    subscription: str,
-    db: DatabaseManager = Depends(get_database)
-):
-    albums = await db.get_albums_by_subscription(subscription)
-    return albums
-
-
-@router.get(
-    "/albums/artist/{artist}",
-    response_description="List all albums by artist",
     response_model=List[AlbumSongModel],
     status_code=status.HTTP_200_OK,
 )
-async def list_albums_by_artist(
-    artist: str,
+async def list_albums_by_subscription(
+    subscription: str = None,
+    artist: str = None,
+    genre: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
-    albums = await db.get_albums_by_artist(artist)
-    return albums
+    manager = AlbumManager(db.db)
+    if subscription:
+        return await manager.get_albums_by_subscription(subscription)
+    if artist:
+        return await manager.get_albums_by_artist(artist)
+    if genre:
+        return await manager.get_albums_by_genre(genre)
+    return []
