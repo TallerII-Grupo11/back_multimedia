@@ -26,13 +26,17 @@ class SongManager():
         delete_result = await self.db["songs"].delete_one({"_id": song_id})
         return delete_result
 
-    async def update_song(self, song_id: str, song: UpdateSongModel = Body(...)):
+    async def update_song(self, song_id: str, song: UpdateSongModel = Body(...)) -> bool:
         song = {k: v for k, v in song.dict().items() if v is not None}
 
         if len(song) >= 1:
-            await self.db["songs"].update_one({"_id": song_id}, {"$set": song})
+            try:
+                await self.db["songs"].update_one({"_id": song_id}, {"$set": song})
+                return True
+            except:
+                return False
 
-    async def add_song(self, song: SongModel = Body(...)):
+    async def add_song(self, song: SongModel = Body(...)) -> SongModel:
         song = jsonable_encoder(song)
         await self.db["songs"].insert_one(song)
         return song

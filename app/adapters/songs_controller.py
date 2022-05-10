@@ -54,7 +54,7 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 @router.put(
     "/songs/{id}",
     response_description="Update a song album",
-    response_model=SongModel,
+    # response_model=SongModel,
     status_code=status.HTTP_200_OK,
 )
 async def update_song(
@@ -64,23 +64,7 @@ async def update_song(
 ):
     manager = SongManager(db.db)
     song = await manager.update_song(song_id=id, song=song)
-    return song
-
-
-@router.delete(
-    "/songs/{id}",
-    response_description="Delete a song",
-    include_in_schema=False,
-    status_code=status.HTTP_200_OK,
-)
-async def delete_song(id: str, db: DatabaseManager = Depends(get_database)):
-    manager = SongManager(db.db)
-    delete_result = await manager.delete_song(song_id=id)
-
-    if delete_result.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Song {id} not found")
+    return JSONResponse(song, status_code=status.HTTP_200_OK)
 
 
 @router.get(

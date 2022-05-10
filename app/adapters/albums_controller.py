@@ -55,7 +55,6 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
 @router.put(
     "/albums/{id}",
     response_description="Update a album",
-    response_model=AlbumModel,
     status_code=status.HTTP_200_OK,
 )
 async def update_album(
@@ -65,23 +64,7 @@ async def update_album(
 ):
     manager = AlbumManager(db.db)
     album = await manager.update_album(album_id=id, album=album)
-    return album
-
-
-@router.delete(
-    "/albums/{id}",
-    response_description="Delete a album",
-    include_in_schema=False,
-    status_code=status.HTTP_200_OK,
-)
-async def delete_album(id: str, db: DatabaseManager = Depends(get_database)):
-    manager = AlbumManager(db.db)
-    delete_result = await manager.delete_album(album_id=id)
-
-    if delete_result.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Album {id} not found")
+    return JSONResponse(album, status_code=status.HTTP_200_OK)
 
 
 @router.get(

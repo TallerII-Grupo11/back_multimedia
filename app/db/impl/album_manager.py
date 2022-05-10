@@ -1,4 +1,5 @@
 from typing import List
+import logging
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -14,22 +15,6 @@ class AlbumManager():
         self.db = db
         self.song_manager = SongManager(self.db)
 
-    async def with_songs(self, album: AlbumModel):
-        songs_list = []
-        for song_id in album["songs"]:
-            song = await self.song_manager.get_song(song_id)
-            songs_list.append(song)
-
-        album_w_song = {"songs": songs_list,
-                        "artist": album["artist"],
-                        "title": album["title"],
-                        "description": album["description"],
-                        "genre": album["genre"],
-                        "subscription": album["subscription"],
-                        "images": album["images"]
-                        }
-        return AlbumSongModel.parse_obj(album_w_song)
-
     async def get_albums(self) -> List[UpdateAlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find()
@@ -43,30 +28,33 @@ class AlbumManager():
 
         return album_w_song
 
-    async def delete_album(self, album_id: str):
-        delete_result = await self.db["albums"].delete_one({"_id": album_id})
-        return delete_result
-
-    async def update_album(self, album_id: str, album: UpdateAlbumModel = Body(...)):
-        album = {k: v for k, v in album.dict().items() if v is not None}
-
-        if len(album) >= 1:
-            if "songs" in album:
-                list_songs = album["songs"]
-                for song in list_songs:
-                    await self.db["albums"].update_one(
-                                                        {"_id": album_id},
-                                                        {"$push": song}
-                                                      )
-
-                del album["songs"]
-
-            await self.db["albums"].update_one({"_id": album_id}, {"$set": album})
-
-    async def add_album(self, album: AlbumModel = Body(...)):
+    async def add_album(self, album: AlbumModel = Body(...)) -> AlbumModel:
         album = jsonable_encoder(album)
         await self.db["albums"].insert_one(album)
         return album
+
+    async def update_album(
+        self, 
+        album_id: str, 
+        album: UpdateAlbumModel = Body(...)
+    ) -> bool:
+        album = {k: v for k, v in album.dict().items() if v is not None}
+
+        try:
+            if len(album) >= 1:
+                if "songs" in album:
+                    list_songs = album["songs"]
+                    await self.db["albums"].update_one({"_id": album_id},
+                                                        {"$push": {"songs": {"$each": list_songs}}}
+                                                       )
+
+                    del album["songs"]
+
+                await self.db["albums"].update_one({"_id": album_id}, {"$set": album})
+            return True
+        except Exception as e:
+            logging.error(f"[UPDATE ALBUM] Info {album} Error: {e}")
+            return False
 
     async def get_albums_by_artist(self, artist: str) -> List[AlbumSongModel]:
         albums_list = []
@@ -96,3 +84,19 @@ class AlbumManager():
             alb = await self.with_songs(album)
             albums_list.append(alb)
         return albums_list
+
+    async def with_songs(self, album: AlbumModel) -> AlbumSongModel:
+        songs_list = []
+        for song_id in album["songs"]:
+            song = await self.song_manager.get_song(song_id)
+            songs_list.append(song)
+
+        album_w_song = {"songs": songs_list,
+                        "artist": album["artist"],
+                        "title": album["title"],
+                        "description": album["description"],
+                        "genre": album["genre"],
+                        "subscription": album["subscription"],
+                        "images": album["images"]
+                        }
+        return AlbumSongModel.parse_obj(album_w_song)

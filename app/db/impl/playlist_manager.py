@@ -1,4 +1,5 @@
 from typing import List
+import logging
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -13,19 +14,10 @@ class PlaylistManager():
         self.db = db
         self.song_manager = SongManager(self.db)
 
-    async def with_songs(self, playlist: PlaylistModel):
-        songs_list = []
-        for song_id in playlist["songs"]:
-            song = await self.song_manager.get_song(song_id)
-            songs_list.append(song)
-
-        playlist_w_song = {"songs": songs_list,
-                           "title": playlist["title"],
-                           "description": playlist["description"],
-                           "is_collaborative": playlist["is_collaborative"],
-                           "user_owner": playlist["user_owner"]
-                           }
-        return PlaylistSongModel.parse_obj(playlist_w_song)
+    async def add_playlist(self, playlist: PlaylistModel = Body(...)) -> PlaylistModel:
+        playlist = jsonable_encoder(playlist)
+        await self.db["playlists"].insert_one(playlist)
+        return playlist
 
     async def get_playlists(self, user_id: str = None) -> List[PlaylistSongModel]:
         playlist_list = []
@@ -59,25 +51,39 @@ class PlaylistManager():
 
         if not (playlist["user_owner"] == playlist_to_update["user_owner"] or
                 playlist_to_update["is_collaborative"] == "yes"):
-            raise RuntimeError(f"User {playlist['user_owner']} \
-                cant not edit Playlist {playlist_id}")
-
-        if len(playlist) >= 1:
+            return {"message": f"User {playlist['user_owner']} \
+                     cant not edit Playlist {playlist_id}"}
+        
+        try:
             if "songs" in playlist:
                 list_songs = playlist["songs"]
-                for song in list_songs:
-                    await self.db["playlists"].update_one(
-                        {"_id": playlist_id},
-                        {"$push": {"songs": {"$each": playlist["songs"]}}}
-                        )
+                await self.db["playlists"]\
+                    .update_one(
+                                {"_id": playlist_id},
+                                {"$push": {"songs": 
+                                            {"$each": list_songs}}
+                                           }
+                                )
 
                 del playlist["songs"]
-            await self.db["playlists"].update_one(
-                                                    {"_id": playlist_id},
-                                                    {"$set": playlist}
-                                                 )
+            await self.db["playlists"].update_one({"_id": playlist_id},
+                                                  {"$set": playlist}
+                                                  )
+            return {"message": f"Sucess edit of playlist {playlist_id}"}
+        except:
+            logging.error(f"[UPDATE ALBUM] Info {playlist} Error: {e}")
+            return {"message": f"Edit of playlist {playlist_id} fail"}
 
-    async def add_playlist(self, playlist: PlaylistModel = Body(...)):
-        playlist = jsonable_encoder(playlist)
-        await self.db["playlists"].insert_one(playlist)
-        return playlist
+    async def with_songs(self, playlist: PlaylistModel) -> PlaylistSongModel:
+        songs_list = []
+        for song_id in playlist["songs"]:
+            song = await self.song_manager.get_song(song_id)
+            songs_list.append(song)
+
+        playlist_w_song = {"songs": songs_list,
+                           "title": playlist["title"],
+                           "description": playlist["description"],
+                           "is_collaborative": playlist["is_collaborative"],
+                           "user_owner": playlist["user_owner"]
+                           }
+        return PlaylistSongModel.parse_obj(playlist_w_song)
