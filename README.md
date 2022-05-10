@@ -16,6 +16,8 @@ docker run -p 5000:5000 --env-file .env back-multimedia:0.1
 
 ### Manual Deploy to Heroku
 
+[Heroku](https://spotifiuby-multimedia.herokuapp.com/docs)
+
 ```
 heroku config:set port=5000
 heroku config:set version="1.0.0"

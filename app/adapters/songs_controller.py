@@ -25,7 +25,6 @@ async def create_song(
 @router.get(
     "/songs",
     response_description="List all songs without album",
-    include_in_schema=False,
     response_model=List[SongModel],
     status_code=status.HTTP_200_OK,
 )
@@ -38,7 +37,6 @@ async def list_songs(db: DatabaseManager = Depends(get_database)):
 @router.get(
     "/songs/{id}",
     response_description="Get a single song",
-    include_in_schema=False,
     response_model=SongModel,
     status_code=status.HTTP_200_OK,
 )
@@ -54,7 +52,6 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 @router.put(
     "/songs/{id}",
     response_description="Update a song album",
-    # response_model=SongModel,
     status_code=status.HTTP_200_OK,
 )
 async def update_song(
