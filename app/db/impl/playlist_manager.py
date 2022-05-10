@@ -51,8 +51,8 @@ class PlaylistManager():
 
         if not (playlist["user_owner"] == playlist_to_update["user_owner"] or
                 playlist_to_update["is_collaborative"] == "yes"):
-            return {"message": f"User {playlist['user_owner']} \
-                     cant not edit Playlist {playlist_id}"}
+            return {"message": f"""User {playlist['user_owner']}
+                     can't edit playlist {playlist_id}"""}
 
         try:
             if "songs" in playlist:
