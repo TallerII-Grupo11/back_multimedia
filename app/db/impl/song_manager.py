@@ -1,4 +1,5 @@
 from typing import List
+import logging
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -26,15 +27,20 @@ class SongManager():
         delete_result = await self.db["songs"].delete_one({"_id": song_id})
         return delete_result
 
-    async def update_song(self, song_id: str, song: UpdateSongModel = Body(...)) -> bool:
+    async def update_song(
+        self,
+        song_id: str,
+        song: UpdateSongModel = Body(...)
+    ) -> bool:
         song = {k: v for k, v in song.dict().items() if v is not None}
 
         if len(song) >= 1:
             try:
                 await self.db["songs"].update_one({"_id": song_id}, {"$set": song})
-                return True
-            except:
-                return False
+                return {"message": f"Success update for song {song_id}"}
+            except Exception as e:
+                logging.error(f"[UPDATE_SONG] Song: {song}")
+                return {"message": e}
 
     async def add_song(self, song: SongModel = Body(...)) -> SongModel:
         song = jsonable_encoder(song)

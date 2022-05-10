@@ -34,8 +34,8 @@ class AlbumManager():
         return album
 
     async def update_album(
-        self, 
-        album_id: str, 
+        self,
+        album_id: str,
         album: UpdateAlbumModel = Body(...)
     ) -> bool:
         album = {k: v for k, v in album.dict().items() if v is not None}
@@ -44,17 +44,18 @@ class AlbumManager():
             if len(album) >= 1:
                 if "songs" in album:
                     list_songs = album["songs"]
-                    await self.db["albums"].update_one({"_id": album_id},
-                                                        {"$push": {"songs": {"$each": list_songs}}}
-                                                       )
+                    await self.db["albums"]\
+                        .update_one({"_id": album_id},
+                                    {"$push": {"songs": {"$each": list_songs}}}
+                                    )
 
                     del album["songs"]
 
                 await self.db["albums"].update_one({"_id": album_id}, {"$set": album})
-            return True
+            return {"message": f"Sucess update for album {album_id}"}
         except Exception as e:
             logging.error(f"[UPDATE ALBUM] Info {album} Error: {e}")
-            return False
+            return {"message": f"Fail update for album {album_id}"}
 
     async def get_albums_by_artist(self, artist: str) -> List[AlbumSongModel]:
         albums_list = []
