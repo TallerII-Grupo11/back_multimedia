@@ -53,16 +53,14 @@ class PlaylistManager():
                 playlist_to_update["is_collaborative"] == "yes"):
             return {"message": f"User {playlist['user_owner']} \
                      cant not edit Playlist {playlist_id}"}
-        
+
         try:
             if "songs" in playlist:
                 list_songs = playlist["songs"]
                 await self.db["playlists"]\
                     .update_one(
                                 {"_id": playlist_id},
-                                {"$push": {"songs": 
-                                            {"$each": list_songs}}
-                                           }
+                                {"$push": {"songs": {"$each": list_songs}}}
                                 )
 
                 del playlist["songs"]
@@ -70,7 +68,7 @@ class PlaylistManager():
                                                   {"$set": playlist}
                                                   )
             return {"message": f"Sucess edit of playlist {playlist_id}"}
-        except:
+        except Exception as e:
             logging.error(f"[UPDATE ALBUM] Info {playlist} Error: {e}")
             return {"message": f"Edit of playlist {playlist_id} fail"}
 
