@@ -23,18 +23,6 @@ async def create_song(
 
 
 @router.get(
-    "/songs",
-    response_description="List all songs without album",
-    response_model=List[SongModel],
-    status_code=status.HTTP_200_OK,
-)
-async def list_songs(db: DatabaseManager = Depends(get_database)):
-    manager = SongManager(db.db)
-    songs = await manager.list_songs_by_album()
-    return songs
-
-
-@router.get(
     "/songs/{id}",
     response_description="Get a single song",
     response_model=SongModel,
@@ -72,12 +60,12 @@ async def update_song(
 )
 async def list_songs_by(
     album_id: str = None,
-    artist: str = None,
+    artist_id: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
     manager = SongManager(db.db)
     if album_id:
         return await manager.list_songs_by_album(album_id)
-    if artist:
-        return await manager.list_songs_by_artist(artist)
+    if artist_id:
+        return await manager.list_songs_by_artist(artist_id)
     return await manager.list_songs_by_album()

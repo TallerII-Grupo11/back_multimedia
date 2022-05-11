@@ -21,7 +21,9 @@ class SongManager():
 
     async def get_song(self, song_id: str) -> SongModel:
         song = await self.db["songs"].find_one({"_id": song_id})
-        return SongModel(**song)
+        if song:
+            return SongModel(**song)
+        return song
 
     async def delete_song(self, song_id: str):
         delete_result = await self.db["songs"].delete_one({"_id": song_id})
@@ -36,6 +38,15 @@ class SongManager():
 
         if len(song) >= 1:
             try:
+                if "artists" in song:
+                    list_artists = song["artists"]
+                    await self.db["songs"]\
+                        .update_one(
+                                    {"_id": song_id},
+                                    {"$push": {"artists": {"$each": list_artists}}}
+                                    )
+
+                    del song["artists"]
                 await self.db["songs"].update_one({"_id": song_id}, {"$set": song})
                 return {"message": f"Success update for song {song_id}"}
             except Exception as e:
@@ -54,9 +65,9 @@ class SongManager():
             songs_list.append(SongModel(**song))
         return songs_list
 
-    async def list_songs_by_artist(self, artist: str) -> List[UpdateSongModel]:
+    async def list_songs_by_artist(self, artist_id: str) -> List[UpdateSongModel]:
         songs_list = []
-        songs_q = self.db["songs"].find({"artists": [artist]})
+        songs_q = self.db["songs"].find({"artists": [artist_id]})
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list

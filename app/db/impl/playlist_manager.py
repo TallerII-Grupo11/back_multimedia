@@ -49,9 +49,9 @@ class PlaylistManager():
         playlist_to_update = await self.get_playlist(playlist_id)
         playlist_to_update = jsonable_encoder(playlist_to_update)
 
-        if not (playlist["user_owner"] == playlist_to_update["user_owner"] or
+        if not (playlist["user_id"] == playlist_to_update["user_owner"] or
                 playlist_to_update["is_collaborative"] == "yes"):
-            return {"message": f"""User {playlist['user_owner']}
+            return {"message": f"""User {playlist['user_id']}
                      can't edit playlist {playlist_id}"""}
 
         try:

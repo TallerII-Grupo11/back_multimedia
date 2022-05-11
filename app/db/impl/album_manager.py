@@ -57,9 +57,9 @@ class AlbumManager():
             logging.error(f"[UPDATE ALBUM] Info {album} Error: {e}")
             return {"message": f"Fail update for album {album_id}"}
 
-    async def get_albums_by_artist(self, artist: str) -> List[AlbumSongModel]:
+    async def get_albums_by_artist(self, artist_id: str) -> List[AlbumSongModel]:
         albums_list = []
-        albums_q = self.db["albums"].find({"artist": artist})
+        albums_q = self.db["albums"].find({"artist": artist_id})
         async for album in albums_q:
             alb = await self.with_songs(album)
             albums_list.append(alb)

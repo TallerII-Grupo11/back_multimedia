@@ -69,21 +69,21 @@ async def update_album(
 
 @router.get(
     "/albums/",
-    response_description="List all albums by subscription",
+    response_description="List all albums by subscription/artist_id/genre",
     response_model=List[AlbumSongModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_albums_by_subscription(
     subscription: str = None,
-    artist: str = None,
+    artist_id: str = None,
     genre: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
     manager = AlbumManager(db.db)
     if subscription:
         return await manager.get_albums_by_subscription(subscription)
-    if artist:
-        return await manager.get_albums_by_artist(artist)
+    if artist_id:
+        return await manager.get_albums_by_artist(artist_id)
     if genre:
         return await manager.get_albums_by_genre(genre)
     return []

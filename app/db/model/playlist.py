@@ -35,7 +35,7 @@ class UpdatePlaylistModel(BaseModel):
     description: Optional[str]
     songs: Optional[List[str]]
     is_collaborative: Optional[str]
-    user_owner: Optional[str]
+    user_id: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -46,7 +46,7 @@ class UpdatePlaylistModel(BaseModel):
                 "description": "Song",
                 "songs": [],
                 "is_collaborative": "no",
-                "user_owner": "user_id"
+                "user_id": "user_id"
             }
         }
 
