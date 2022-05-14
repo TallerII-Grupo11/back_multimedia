@@ -70,7 +70,8 @@ class AlbumManager():
             albums_list.append(AlbumModel(**album))
         return albums_list
 
-    async def add_song(self,
+    async def add_song(
+        self,
         album_id: str,
         album: SongAlbumModel = Body(...)
     ) -> AlbumModel:

@@ -95,7 +95,7 @@ async def delete_playlist(id: str, db: DatabaseManager = Depends(get_database)):
     response_description="Add song to playlist",
     status_code=status.HTTP_200_OK,
 )
-async def update_playlist(
+async def add_song_to_playlist(
     id: str,
     playlist: SongPlaylistModel = Body(...),
     db: DatabaseManager = Depends(get_database)
