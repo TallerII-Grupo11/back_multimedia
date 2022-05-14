@@ -12,17 +12,16 @@ class SongManager():
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
 
-    async def get_songs(self) -> List[UpdateSongModel]:
+    async def get_songs(self) -> List[SongModel]:
         songs_list = []
         songs_q = self.db["songs"].find()
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list
 
-    async def get_song(self, song_id: str) -> SongModel:
+    async def get_song(self, song_id: str) -> UpdateSongModel:
         song = await self.db["songs"].find_one({"_id": song_id})
-        if song:
-            return SongModel(**song)
+        logging.info(f"[SONG] {song}")
         return song
 
     async def delete_song(self, song_id: str):
@@ -33,39 +32,25 @@ class SongManager():
         self,
         song_id: str,
         song: UpdateSongModel = Body(...)
-    ) -> bool:
+    ) -> SongModel:
         song = {k: v for k, v in song.dict().items() if v is not None}
 
         if len(song) >= 1:
             try:
-                if "artists" in song:
-                    list_artists = song["artists"]
-                    await self.db["songs"]\
-                        .update_one(
-                                    {"_id": song_id},
-                                    {"$push": {"artists": {"$each": list_artists}}}
-                                    )
-
-                    del song["artists"]
                 await self.db["songs"].update_one({"_id": song_id}, {"$set": song})
-                return {"message": f"Success update for song {song_id}"}
+                song_model = await self.get_song(song_id)
+                return song_model
             except Exception as e:
-                logging.error(f"[UPDATE_SONG] Song: {song}")
-                return {"message": e}
+                msg = f"[UPDATE_SONG] Song: {song} error: {e}"
+                logging.error(msg)
+                raise RuntimeError(msg)
 
     async def add_song(self, song: SongModel = Body(...)) -> SongModel:
         song = jsonable_encoder(song)
         await self.db["songs"].insert_one(song)
         return song
 
-    async def list_songs_by_album(self, album_id: str = None) -> List[UpdateSongModel]:
-        songs_list = []
-        songs_q = self.db["songs"].find({"album_id": album_id})
-        async for song in songs_q:
-            songs_list.append(SongModel(**song))
-        return songs_list
-
-    async def list_songs_by_artist(self, artist_id: str) -> List[UpdateSongModel]:
+    async def list_songs_by_artist(self, artist_id: str) -> List[SongModel]:
         songs_list = []
         songs_q = self.db["songs"].find({"artists": [artist_id]})
         async for song in songs_q:

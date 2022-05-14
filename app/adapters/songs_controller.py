@@ -25,16 +25,30 @@ async def create_song(
 @router.get(
     "/songs/{id}",
     response_description="Get a single song",
-    response_model=SongModel,
+    response_model=UpdateSongModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
     manager = SongManager(db.db)
-    song = await manager.get_song(song_id=id)
-    if song is not None:
+    try:
+        song = await manager.get_song(song_id=id)
         return song
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
 
-    raise HTTPException(status_code=404, detail=f"Song {id} not found")
+
+@router.get(
+    "/songs/",
+    response_description="List all songs in by artist or album",
+    response_model=List[SongModel],
+    status_code=status.HTTP_200_OK,
+)
+async def list_songs_by(
+    artist_id: str = None,
+    db: DatabaseManager = Depends(get_database)
+):
+    manager = SongManager(db.db)
+    return await manager.list_songs_by_artist(artist_id)
 
 
 @router.put(
@@ -50,22 +64,3 @@ async def update_song(
     manager = SongManager(db.db)
     song = await manager.update_song(song_id=id, song=song)
     return JSONResponse(song, status_code=status.HTTP_200_OK)
-
-
-@router.get(
-    "/songs/",
-    response_description="List all songs in by artist or album",
-    response_model=List[SongModel],
-    status_code=status.HTTP_200_OK,
-)
-async def list_songs_by(
-    album_id: str = None,
-    artist_id: str = None,
-    db: DatabaseManager = Depends(get_database)
-):
-    manager = SongManager(db.db)
-    if album_id:
-        return await manager.list_songs_by_album(album_id)
-    if artist_id:
-        return await manager.list_songs_by_artist(artist_id)
-    return await manager.list_songs_by_album()

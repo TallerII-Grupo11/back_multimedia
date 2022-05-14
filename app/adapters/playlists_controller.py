@@ -4,7 +4,7 @@ from typing import List
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel, PlaylistSongModel
+from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel, SongPlaylistModel
 from app.db.impl.playlist_manager import PlaylistManager
 
 
@@ -44,7 +44,7 @@ async def list_playlists(
 @router.get(
     "/playlists/{id}",
     response_description="Get a single Playlist",
-    response_model=PlaylistSongModel,
+    response_model=PlaylistModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_playlist(id: str, db: DatabaseManager = Depends(get_database)):
@@ -67,8 +67,11 @@ async def update_playlist(
     db: DatabaseManager = Depends(get_database)
 ):
     manager = PlaylistManager(db.db)
-    playlist = await manager.update_playlist(playlist_id=id, playlist=playlist)
-    return JSONResponse(playlist, status_code=status.HTTP_200_OK)
+    try:
+        playlist = await manager.update_playlist(playlist_id=id, playlist=playlist)
+        return playlist
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
 
 
 @router.delete(
@@ -85,3 +88,21 @@ async def delete_playlist(id: str, db: DatabaseManager = Depends(get_database)):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Playlist {id} not found")
+
+
+@router.patch(
+    "/playlist/{id}",
+    response_description="Add song to playlist",
+    status_code=status.HTTP_200_OK,
+)
+async def update_playlist(
+    id: str,
+    playlist: SongPlaylistModel = Body(...),
+    db: DatabaseManager = Depends(get_database)
+):
+    manager = PlaylistManager(db.db)
+    try:
+        playlist = await manager.add_song(playlist_id=id, playlist=playlist)
+        return playlist
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)

@@ -4,7 +4,7 @@ from typing import List
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.album import AlbumModel, UpdateAlbumModel, AlbumSongModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
 from app.db.impl.album_manager import AlbumManager
 
 
@@ -40,7 +40,7 @@ async def list_albums(db: DatabaseManager = Depends(get_database)):
 @router.get(
     "/albums/{id}",
     response_description="Get a single album",
-    response_model=AlbumSongModel,
+    response_model=UpdateAlbumModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
@@ -52,28 +52,13 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
 
 
-@router.put(
-    "/albums/{id}",
-    response_description="Update a album",
-    status_code=status.HTTP_200_OK,
-)
-async def update_album(
-    id: str,
-    album: UpdateAlbumModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
-):
-    manager = AlbumManager(db.db)
-    album = await manager.update_album(album_id=id, album=album)
-    return JSONResponse(album, status_code=status.HTTP_200_OK)
-
-
 @router.get(
     "/albums/",
     response_description="List all albums by subscription/artist_id/genre",
-    response_model=List[AlbumSongModel],
+    response_model=List[AlbumModel],
     status_code=status.HTTP_200_OK,
 )
-async def list_albums_by_subscription(
+async def list_albums_by(
     subscription: str = None,
     artist_id: str = None,
     genre: str = None,
@@ -87,3 +72,36 @@ async def list_albums_by_subscription(
     if genre:
         return await manager.get_albums_by_genre(genre)
     return []
+
+
+@router.put(
+    "/albums/{id}",
+    response_description="Update a album",
+    status_code=status.HTTP_200_OK,
+)
+async def update_album(
+    id: str,
+    album: UpdateAlbumModel = Body(...),
+    db: DatabaseManager = Depends(get_database)
+):
+    manager = AlbumManager(db.db)
+    try:
+        album = await manager.update_album(album_id=id, album=album)
+        return JSONResponse(album, status_code=status.HTTP_200_OK)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
+
+
+@router.patch(
+    "/albums/{id}",
+    response_description="Add song to album",
+    status_code=status.HTTP_200_OK,
+)
+async def add_song_to_album(
+    id: str,
+    album: SongAlbumModel = Body(...),
+    db: DatabaseManager = Depends(get_database)
+):
+    manager = AlbumManager(db.db)
+    album = await manager.add_song(album_id=id, album=album)
+    return JSONResponse(album, status_code=status.HTTP_200_OK)
