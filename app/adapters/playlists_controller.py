@@ -91,8 +91,8 @@ async def delete_playlist(id: str, db: DatabaseManager = Depends(get_database)):
 
 
 @router.patch(
-    "/playlists/{id}",
-    response_description="Add song to playlist",
+    "/playlists/{id}/songs",
+    response_description="Add songs to playlist",
     status_code=status.HTTP_200_OK,
 )
 async def add_song_to_playlist(

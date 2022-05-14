@@ -38,7 +38,7 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 
 
 @router.get(
-    "/songs/",
+    "/songs",
     response_description="List all songs in by artist or album",
     response_model=List[SongModel],
     status_code=status.HTTP_200_OK,

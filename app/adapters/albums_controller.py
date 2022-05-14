@@ -27,12 +27,23 @@ async def create_album(
 
 @router.get(
     "/albums",
-    response_description="List all albums",
+    response_description="List albums by query",
     response_model=List[AlbumModel],
     status_code=status.HTTP_200_OK,
 )
-async def list_albums(db: DatabaseManager = Depends(get_database)):
+async def list_albums(
+    subscription: str = None,
+    artist_id: str = None,
+    genre: str = None,
+    db: DatabaseManager = Depends(get_database)
+):
     manager = AlbumManager(db.db)
+    if subscription:
+        return await manager.get_albums_by_subscription(subscription)
+    if artist_id:
+        return await manager.get_albums_by_artist(artist_id)
+    if genre:
+        return await manager.get_albums_by_genre(genre)
     albums = await manager.get_albums()
     return albums
 
@@ -50,28 +61,6 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
         return album
 
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
-
-
-@router.get(
-    "/albums/",
-    response_description="List all albums by subscription/artist_id/genre",
-    response_model=List[AlbumModel],
-    status_code=status.HTTP_200_OK,
-)
-async def list_albums_by(
-    subscription: str = None,
-    artist_id: str = None,
-    genre: str = None,
-    db: DatabaseManager = Depends(get_database)
-):
-    manager = AlbumManager(db.db)
-    if subscription:
-        return await manager.get_albums_by_subscription(subscription)
-    if artist_id:
-        return await manager.get_albums_by_artist(artist_id)
-    if genre:
-        return await manager.get_albums_by_genre(genre)
-    return []
 
 
 @router.put(
@@ -93,8 +82,8 @@ async def update_album(
 
 
 @router.patch(
-    "/albums/{id}",
-    response_description="Add song to album",
+    "/albums/{id}/songs",
+    response_description="Add songs to album",
     status_code=status.HTTP_200_OK,
 )
 async def add_song_to_album(
