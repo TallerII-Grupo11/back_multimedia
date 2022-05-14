@@ -57,7 +57,7 @@ async def show_playlist(id: str, db: DatabaseManager = Depends(get_database)):
 
 
 @router.put(
-    "/playlist/{id}",
+    "/playlists/{id}",
     response_description="Update a playlist",
     status_code=status.HTTP_200_OK,
 )
@@ -91,7 +91,7 @@ async def delete_playlist(id: str, db: DatabaseManager = Depends(get_database)):
 
 
 @router.patch(
-    "/playlist/{id}",
+    "/playlists/{id}",
     response_description="Add song to playlist",
     status_code=status.HTTP_200_OK,
 )
