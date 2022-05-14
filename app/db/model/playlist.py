@@ -4,7 +4,6 @@ from pydantic import Field
 from pydantic.main import BaseModel
 from typing import List, Optional
 from bson import ObjectId
-from app.db.model.song import SongModel
 
 
 class PlaylistModel(BaseModel):
@@ -13,7 +12,7 @@ class PlaylistModel(BaseModel):
     description: str = Field(...)
     songs: List[str] = []
     is_collaborative: str = Field(...)
-    user_owner: str = Field(...)
+    owner_id: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -25,7 +24,7 @@ class PlaylistModel(BaseModel):
                 "description": "Song",
                 "songs": [],
                 "is_collaborative": "no",
-                "user_owner": "user_id"
+                "owner_id": "user_id"
             }
         }
 
@@ -35,7 +34,7 @@ class UpdatePlaylistModel(BaseModel):
     description: Optional[str]
     songs: Optional[List[str]]
     is_collaborative: Optional[str]
-    user_owner: Optional[str]
+    owner_id: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -46,27 +45,21 @@ class UpdatePlaylistModel(BaseModel):
                 "description": "Song",
                 "songs": [],
                 "is_collaborative": "no",
-                "user_owner": "user_id"
+                "owner_id": "user_id"
             }
         }
 
 
-class PlaylistSongModel(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    songs: Optional[List[SongModel]]
-    is_collaborative: Optional[str]
-    user_owner: Optional[str]
+class SongPlaylistModel(BaseModel):
+    songs: Optional[List[str]]
+    owner_id: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "title": "Cancion Animal",
-                "description": "Song",
                 "songs": [],
-                "is_collaborative": "no",
-                "user_owner": "user_id"
+                "owner_id": "user_id"
             }
         }

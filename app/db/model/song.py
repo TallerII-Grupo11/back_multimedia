@@ -10,9 +10,8 @@ class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
     artists: List[str] = Field(...)
-    album_id: str = None
     description: str = Field(...)
-    music_file: str = Field(...)
+    song_file: str = Field(...)
 
     class Config:
         orm_mode = True
@@ -22,10 +21,9 @@ class SongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["Soda Stereo"],
-                "album_id": "album_id",
+                "artists": ["artist_id"],
                 "description": "Song",
-                "music_file": "file_name"
+                "song_file": "file_name"
             }
         }
 
@@ -33,9 +31,8 @@ class SongModel(BaseModel):
 class UpdateSongModel(BaseModel):
     title: Optional[str]
     artists: Optional[List[str]]
-    album_id: Optional[str]
     description: Optional[str]
-    music_file: Optional[str]
+    song_file: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -43,9 +40,8 @@ class UpdateSongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["Soda Stereo"],
-                "album_id": "album_id",
+                "artists": ["artist_id"],
                 "description": "Song",
-                "music_file": "file_name"
+                "song_file": "file_name"
             }
         }
