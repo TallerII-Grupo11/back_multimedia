@@ -40,7 +40,7 @@ async def list_albums(
     manager = AlbumManager(db.db)
     if subscription:
         return await manager.get_albums_by_subscription(subscription)
-    if artist_id:
+    if artist:
         return await manager.get_albums_by_artist(artist)
     if genre:
         return await manager.get_albums_by_genre(genre)
