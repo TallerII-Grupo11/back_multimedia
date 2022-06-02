@@ -44,11 +44,11 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
     status_code=status.HTTP_200_OK,
 )
 async def list_songs_by(
-    artist_id: str = None,
+    artist: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
     manager = SongManager(db.db)
-    return await manager.list_songs_by_artist(artist_id)
+    return await manager.list_songs_by_artist(artist)
 
 
 @router.put(

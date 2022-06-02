@@ -21,7 +21,7 @@ class SongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["artist_id"],
+                "artists": ["artist name"],
                 "description": "Song",
                 "song_file": "file_name"
             }
@@ -40,7 +40,7 @@ class UpdateSongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["artist_id"],
+                "artists": ["artist name"],
                 "description": "Song",
                 "song_file": "file_name"
             }
