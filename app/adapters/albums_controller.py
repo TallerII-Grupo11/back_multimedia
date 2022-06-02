@@ -33,7 +33,7 @@ async def create_album(
 )
 async def list_albums(
     subscription: str = None,
-    artist_id: str = None,
+    artist: str = None,
     genre: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
@@ -41,7 +41,7 @@ async def list_albums(
     if subscription:
         return await manager.get_albums_by_subscription(subscription)
     if artist_id:
-        return await manager.get_albums_by_artist(artist_id)
+        return await manager.get_albums_by_artist(artist)
     if genre:
         return await manager.get_albums_by_genre(genre)
     albums = await manager.get_albums()
