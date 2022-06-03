@@ -11,7 +11,7 @@ class PlaylistModel(BaseModel):
     title: str = Field(...)
     description: str = Field(...)
     songs: List[str] = []
-    is_collaborative: str = Field(...)
+    is_collaborative: bool = Field(...)
     owner_id: str = Field(...)
 
     class Config:
@@ -23,7 +23,7 @@ class PlaylistModel(BaseModel):
                 "title": "Cancion Animal",
                 "description": "Song",
                 "songs": [],
-                "is_collaborative": "no",
+                "is_collaborative": False,
                 "owner_id": "user_id"
             }
         }
@@ -33,7 +33,7 @@ class UpdatePlaylistModel(BaseModel):
     title: Optional[str]
     description: Optional[str]
     songs: Optional[List[str]]
-    is_collaborative: Optional[str]
+    is_collaborative: Optional[bool]
     owner_id: Optional[str]
 
     class Config:
@@ -44,7 +44,7 @@ class UpdatePlaylistModel(BaseModel):
                 "title": "Cancion Animal",
                 "description": "Song",
                 "songs": [],
-                "is_collaborative": "no",
+                "is_collaborative": False,
                 "owner_id": "user_id"
             }
         }
