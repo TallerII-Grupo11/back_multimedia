@@ -10,8 +10,8 @@
 
 Run app commands local
 ```
-docker build -t back-multimedia:0.1 .
-docker run -p 5000:5000 --env-file .env back-multimedia:0.1
+docker build -t back-multimedia .
+docker run -p 5000:5000 --env-file .env back-multimedia
 ```
 
 ### Manual Deploy to Heroku

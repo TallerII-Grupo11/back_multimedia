@@ -13,8 +13,8 @@ class AlbumModel(BaseModel):
     artist: str = Field(...)
     description: str = Field(...)
     genre: str = Field(...)
-    images: List[str] = Field(...)
-    subscription: Subscription = Field(...)
+    image: str = Field(...)
+    subscription: str = Field(...)
     songs: List[str] = []
 
     class Config:
@@ -27,7 +27,7 @@ class AlbumModel(BaseModel):
                 "artist": "Soda Stereo",
                 "description": "Song",
                 "genre": "rock",
-                "images": ["image.png"],
+                "image": "image.png",
                 "subscription": "free",
                 "songs": []
             }
@@ -39,7 +39,7 @@ class UpdateAlbumModel(BaseModel):
     description: Optional[str]
     artist: Optional[str]
     genre: Optional[str]
-    images: Optional[List[str]]
+    image: Optional[str]
     subscription: Optional[Subscription]
     songs: Optional[List[str]]
 
@@ -52,7 +52,7 @@ class UpdateAlbumModel(BaseModel):
                 "artist": "Soda Stereo",
                 "description": "Song",
                 "genre": "rock",
-                "images": ["image.png"],
+                "image": "image.png",
                 "subscription": "free",
                 "songs": []
             }
