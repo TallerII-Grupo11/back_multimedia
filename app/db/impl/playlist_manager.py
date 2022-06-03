@@ -41,29 +41,37 @@ class PlaylistManager():
         playlist_id: str,
         playlist: UpdatePlaylistModel = Body(...)
     ) -> PlaylistModel:
-        playlist = {k: v for k, v in playlist.dict().items() if v is not None}
-        available = await self.check_update_available(playlist_id, playlist)
-        if available:
-            await self.db["playlists"].update_one({"_id": playlist_id},
-                                                  {"$set": playlist}
-                                                  )
-        playlist_model = await self.get_playlist(playlist_id)
-        return playlist_model
+        try:
+            playlist = {k: v for k, v in playlist.dict().items() if v is not None}
+            available = await self.check_update_available(playlist_id, playlist)
+            if available:
+                await self.db["playlists"].update_one({"_id": playlist_id},
+                                                      {"$set": playlist}
+                                                      )
+            playlist_model = await self.get_playlist(playlist_id)
+            return playlist_model
+        except Exception as e:
+            logging.info(f"{e}")
+            return e
 
     async def add_song(
         self,
         playlist_id: str,
         playlist: SongPlaylistModel = Body(...)
     ) -> PlaylistModel:
-        playlist = {k: v for k, v in playlist.dict().items() if v is not None}
-        available = await self.check_update_available(playlist_id, playlist)
-        if available and "songs" in playlist:
-            await self.db["playlists"]\
-                    .update_one({"_id": playlist_id},
-                                {"$push": {"songs": {"$each": playlist["songs"]}}}
-                                )
-        playlist_model = await self.get_playlist(playlist_id)
-        return playlist_model
+        try:
+            playlist = {k: v for k, v in playlist.dict().items() if v is not None}
+            available = await self.check_update_available(playlist_id, playlist)
+            if available and "songs" in playlist:
+                await self.db["playlists"]\
+                        .update_one({"_id": playlist_id},
+                                    {"$push": {"songs": {"$each": playlist["songs"]}}}
+                                    )
+            playlist_model = await self.get_playlist(playlist_id)
+            return playlist_model
+        except Exception as e:
+            logging.info(f"{e}")
+            return e
 
     async def check_update_available(
         self,
@@ -74,7 +82,7 @@ class PlaylistManager():
         playlist_to_update = jsonable_encoder(playlist_to_update)
 
         if not (playlist["owner_id"] == playlist_to_update["owner_id"] or
-                playlist_to_update["is_collaborative"] == "yes"):
+                playlist_to_update["is_collaborative"] == True):
             msg = f"User {playlist['owner_id']} can't edit playlist {playlist_id}"
             logging.error(msg)
             raise RuntimeError(msg)
