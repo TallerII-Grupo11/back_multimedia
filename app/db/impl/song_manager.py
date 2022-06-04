@@ -50,9 +50,9 @@ class SongManager():
         await self.db["songs"].insert_one(song)
         return song
 
-    async def list_songs_by_artist(self, artist_id: str) -> List[SongModel]:
+    async def list_songs_by_artist(self, artist_name: str) -> List[SongModel]:
         songs_list = []
-        songs_q = self.db["songs"].find({"artists": [artist_id]})
+        songs_q = self.db["songs"].find({"artists": {"$elemMatch": {"artist_name": artist_name}}})
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list

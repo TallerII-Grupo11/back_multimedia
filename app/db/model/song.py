@@ -4,12 +4,13 @@ from pydantic import Field
 from pydantic.main import BaseModel
 from typing import List, Optional
 from bson import ObjectId
+from app.db.model.artist import ArtistModel
 
 
 class SongModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
-    artists: List[str] = Field(...)
+    artists: List[ArtistModel] = Field(...)
     description: str = Field(...)
     song_file: str = Field(...)
 
@@ -21,7 +22,12 @@ class SongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["artist name"],
+                "artists": [
+                    {
+                        "artist_id": "id",
+                        "artist_name": "name",
+                    }
+                ],
                 "description": "Song",
                 "song_file": "file_name"
             }
@@ -30,7 +36,7 @@ class SongModel(BaseModel):
 
 class UpdateSongModel(BaseModel):
     title: Optional[str]
-    artists: Optional[List[str]]
+    artists: Optional[List[ArtistModel]]
     description: Optional[str]
     song_file: Optional[str]
 
@@ -40,7 +46,12 @@ class UpdateSongModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artists": ["artist name"],
+                "artists": [
+                    {
+                        "artist_id": "id",
+                        "artist_name": "name",
+                    }
+                ],
                 "description": "Song",
                 "song_file": "file_name"
             }

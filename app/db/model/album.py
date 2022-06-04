@@ -5,12 +5,13 @@ from pydantic.main import BaseModel
 from typing import List, Optional
 from bson import ObjectId
 from app.db.model.subscription import Subscription
+from app.db.model.artist import ArtistModel
 
 
 class AlbumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
-    artist: str = Field(...)
+    artist: ArtistModel = Field(...)
     description: str = Field(...)
     genre: str = Field(...)
     image: str = Field(...)
@@ -24,7 +25,10 @@ class AlbumModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artist": "Soda Stereo",
+                "artist": {
+                    "artist_id": "id",
+                    "artist_name": "name",
+                },
                 "description": "Song",
                 "genre": "rock",
                 "image": "image.png",
@@ -37,7 +41,7 @@ class AlbumModel(BaseModel):
 class UpdateAlbumModel(BaseModel):
     title: Optional[str]
     description: Optional[str]
-    artist: Optional[str]
+    artist: Optional[ArtistModel]
     genre: Optional[str]
     image: Optional[str]
     subscription: Optional[Subscription]
@@ -49,7 +53,10 @@ class UpdateAlbumModel(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Cancion Animal",
-                "artist": "Soda Stereo",
+                "artist": {
+                    "artist_id": "id",
+                    "artist_name": "name",
+                },
                 "description": "Song",
                 "genre": "rock",
                 "image": "image.png",
@@ -64,7 +71,7 @@ class SongAlbumModel(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, Subscription: str}
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "songs": []
