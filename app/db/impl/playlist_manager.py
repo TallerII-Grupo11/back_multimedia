@@ -82,7 +82,7 @@ class PlaylistManager():
         playlist_to_update = jsonable_encoder(playlist_to_update)
 
         if not (playlist["owner_id"] == playlist_to_update["owner_id"] or
-                playlist_to_update["is_collaborative"] == True):
+                playlist_to_update["is_collaborative"]):
             msg = f"User {playlist['owner_id']} can't edit playlist {playlist_id}"
             logging.error(msg)
             raise RuntimeError(msg)
