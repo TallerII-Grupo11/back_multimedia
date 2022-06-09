@@ -7,6 +7,7 @@ from app.adapters import albums_controller
 from app.adapters import playlists_controller
 from app.conf.config import Settings
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.db import db
 
 logging.config.fileConfig('app/conf/logging.conf', disable_existing_loggers=False)
@@ -19,6 +20,17 @@ app = FastAPI(version=settings.version, title=settings.title)
 app.include_router(songs_controller.router)
 app.include_router(albums_controller.router)
 app.include_router(playlists_controller.router)
+
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
