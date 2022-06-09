@@ -22,7 +22,7 @@ class PlaylistModel(BaseModel):
             "example": {
                 "title": "Cancion Animal",
                 "description": "Song",
-                "songs": [],
+                "songs": ["song_id_1", "song_id_2"],
                 "is_collaborative": False,
                 "owner_id": "user_id"
             }
@@ -43,7 +43,7 @@ class UpdatePlaylistModel(BaseModel):
             "example": {
                 "title": "Cancion Animal",
                 "description": "Song",
-                "songs": [],
+                "songs": ["song_id_1", "song_id_2"],
                 "is_collaborative": False,
                 "owner_id": "user_id"
             }
@@ -59,7 +59,7 @@ class SongPlaylistModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "songs": [],
+                "songs": ["song_id_1", "song_id_2"],
                 "owner_id": "user_id"
             }
         }

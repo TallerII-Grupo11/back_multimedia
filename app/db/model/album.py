@@ -26,14 +26,14 @@ class AlbumModel(BaseModel):
             "example": {
                 "title": "Cancion Animal",
                 "artist": {
-                    "artist_id": "id",
-                    "artist_name": "name",
+                    "artist_id": "artist_id",
+                    "artist_name": "Soda Stereo",
                 },
                 "description": "Song",
                 "genre": "rock",
                 "image": "image.png",
                 "subscription": "free",
-                "songs": []
+                "songs": ["song_id_1", "song_id_2"]
             }
         }
 
@@ -54,14 +54,14 @@ class UpdateAlbumModel(BaseModel):
             "example": {
                 "title": "Cancion Animal",
                 "artist": {
-                    "artist_id": "id",
+                    "artist_id": "artist_id",
                     "artist_name": "name",
                 },
                 "description": "Song",
                 "genre": "rock",
                 "image": "image.png",
                 "subscription": "free",
-                "songs": []
+                "songs": ["song_id_1", "song_id_2"]
             }
         }
 
@@ -74,6 +74,6 @@ class SongAlbumModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "songs": []
+                "songs": ["song_id_1", "song_id_2"]
             }
         }
