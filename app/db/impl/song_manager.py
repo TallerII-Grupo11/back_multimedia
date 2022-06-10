@@ -58,3 +58,10 @@ class SongManager():
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list
+
+    async def list_songs_by_genre(self, genre: str) -> List[SongModel]:
+        songs_list = []
+        songs_q = self.db["songs"].find({"genre": genre})
+        async for song in songs_q:
+            songs_list.append(SongModel(**song))
+        return songs_list
