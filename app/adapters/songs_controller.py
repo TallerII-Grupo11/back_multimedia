@@ -56,7 +56,6 @@ async def list_songs_by(
     return manager.get_songs()
 
 
-
 @router.put(
     "/songs/{id}",
     response_description="Update a song album",
