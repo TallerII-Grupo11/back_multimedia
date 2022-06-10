@@ -12,6 +12,7 @@ class SongModel(BaseModel):
     title: str = Field(...)
     artists: List[ArtistModel] = Field(...)
     description: str = Field(...)
+    genre: str = Field(...)
     song_file: str = Field(...)
 
     class Config:
@@ -29,7 +30,8 @@ class SongModel(BaseModel):
                     }
                 ],
                 "description": "Song",
-                "song_file": "file_name"
+                "song_file": "file_name",
+                "genre": "genre_name"
             }
         }
 
@@ -39,6 +41,7 @@ class UpdateSongModel(BaseModel):
     artists: Optional[List[ArtistModel]]
     description: Optional[str]
     song_file: Optional[str]
+    genre: Optional[str]
 
     class Config:
         arbitrary_types_allowed = True
@@ -53,6 +56,7 @@ class UpdateSongModel(BaseModel):
                     }
                 ],
                 "description": "Song",
-                "song_file": "file_name"
+                "song_file": "file_name",
+                "genre": "genre_name"
             }
         }

@@ -39,16 +39,22 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 
 @router.get(
     "/songs",
-    response_description="List all songs in by artist or album",
+    response_description="List all songs in by artist or genre",
     response_model=List[SongModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_songs_by(
     artist_name: str = None,
+    genre: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
     manager = SongManager(db.db)
-    return await manager.list_songs_by_artist(artist_name)
+    if artist_name:
+        return await manager.list_songs_by_artist(artist_name)
+    if genre:
+        return await manager.list_songs_by_genre(genre)
+    return manager.get_songs()
+
 
 
 @router.put(
