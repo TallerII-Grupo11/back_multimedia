@@ -53,7 +53,7 @@ async def list_songs_by(
         return await manager.list_songs_by_artist(artist_name)
     if genre:
         return await manager.list_songs_by_genre(genre)
-    return manager.get_songs()
+    return await manager.get_songs()
 
 
 @router.put(
