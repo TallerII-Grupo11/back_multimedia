@@ -91,3 +91,9 @@ class AlbumManager():
             msg = f"[ADD SONG TO ALBUM] Info {album} Error: {e}"
             logging.error(msg)
             raise RuntimeError(msg)
+
+    async def get_albums_by_song(self, song_id: str) -> AlbumModel:
+        albums_q = await self.db["albums"].find_one(
+            {"songs": song_id}
+        )
+        return albums_q

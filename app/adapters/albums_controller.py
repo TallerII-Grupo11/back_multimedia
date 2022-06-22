@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
 from app.db.impl.album_manager import AlbumManager
+import logging
 
 
 router = APIRouter(tags=["albums"])
@@ -28,12 +29,13 @@ async def create_album(
 @router.get(
     "/albums",
     response_description="List albums by query",
-    response_model=List[AlbumModel],
+    #response_model=List[AlbumModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_albums(
     subscription: str = None,
     artist_name: str = None,
+    song_id: str = None,
     genre: str = None,
     db: DatabaseManager = Depends(get_database)
 ):
@@ -44,6 +46,12 @@ async def list_albums(
         return await manager.get_albums_by_artist(artist_name)
     if genre:
         return await manager.get_albums_by_genre(genre)
+    if song_id:
+        album = await manager.get_albums_by_song(song_id)
+        if album:
+            return JSONResponse(album, status_code=status.HTTP_200_OK)
+        raise HTTPException(status_code=400, detail=f"Album for song {song_id} NOT_FOUND")
+
     albums = await manager.get_albums()
     return albums
 
