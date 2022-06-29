@@ -5,6 +5,8 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
 from app.db.impl.album_manager import AlbumManager
+from app.rest.metric_client import MetricClient
+from app.rest import get_restclient_metrics
 
 
 router = APIRouter(tags=["albums"])
@@ -17,9 +19,11 @@ router = APIRouter(tags=["albums"])
 )
 async def create_album(
     album: AlbumModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
+    rest_metric: MetricClient = Depends(get_restclient_metrics),
 ):
     manager = AlbumManager(db.db)
+    rest_metric.post_new_album(album)
     created_album = await manager.add_album(album)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_album)
 

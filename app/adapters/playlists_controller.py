@@ -6,6 +6,8 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel, SongPlaylistModel
 from app.db.impl.playlist_manager import PlaylistManager
+from app.rest.metric_client import MetricClient
+from app.rest import get_restclient_metrics
 
 
 router = APIRouter(tags=["playlist"])
@@ -18,9 +20,11 @@ router = APIRouter(tags=["playlist"])
 )
 async def create_playlist(
     playlist: PlaylistModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
+    rest_metric: MetricClient = Depends(get_restclient_metrics),
 ):
     manager = PlaylistManager(db.db)
+    rest_metric.post_new_playlist(playlist)
     created_playlist = await manager.add_playlist(playlist)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_playlist)
 

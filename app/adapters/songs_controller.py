@@ -3,7 +3,10 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.impl.song_manager import SongManager
 from app.db.model.song import SongModel, UpdateSongModel
+from app.rest import get_restclient_metrics
+from app.rest.metric_client import MetricClient
 from typing import List
+
 
 router = APIRouter(tags=["songs"])
 
@@ -15,9 +18,11 @@ router = APIRouter(tags=["songs"])
 )
 async def create_song(
     song: SongModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
+    rest_metric: MetricClient = Depends(get_restclient_metrics),
 ):
     manager = SongManager(db.db)
+    rest_metric.post_new_song(song)
     created_song = await manager.add_song(song)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_song)
 
