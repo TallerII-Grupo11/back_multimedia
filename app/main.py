@@ -5,6 +5,7 @@ import logging.config
 from app.adapters import songs_controller
 from app.adapters import albums_controller
 from app.adapters import playlists_controller
+from app.adapters import health_controller
 from app.conf.config import Settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +21,7 @@ app = FastAPI(version=settings.version, title=settings.title)
 app.include_router(songs_controller.router)
 app.include_router(albums_controller.router)
 app.include_router(playlists_controller.router)
+app.include_router(health_controller.router)
 
 
 origins = ["*"]
