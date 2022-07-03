@@ -2,6 +2,7 @@ from app.db.model.py_object_id import PyObjectId
 from pydantic import Field
 
 from pydantic.main import BaseModel
+from pydantic import validator
 from typing import List, Optional
 from bson import ObjectId
 from app.db.model.subscription import Subscription
@@ -17,6 +18,12 @@ class AlbumModel(BaseModel):
     image: str = Field(...)
     subscription: str = Field(...)
     songs: List[str] = []
+
+    @validator('subscription')
+    def subscription_values(cls, v):
+        if v not in ["free", "normal", "premium"]:
+            raise ValueError(f'Subscription value {v} not allowed')
+        return v
 
     class Config:
         allow_population_by_field_name = True
