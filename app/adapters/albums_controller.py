@@ -66,20 +66,19 @@ async def list_albums(
             status_code=400, detail=f"Album for song {song_id} NOT_FOUND"
         )
 
+    list_albums = await manager.get_albums()
     albumss = []
     for album in list_albums:
         album_json = jsonable_encoder(album)
         album_json["id"] = album_json["_id"]
         del album_json["_id"]
         albumss.append(album_json)
-    albums = await manager.get_albums()
-    return albums
+    return albumss
 
 
 @router.get(
     "/albums/{id}",
     response_description="Get a single album",
-    response_model=AlbumModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):

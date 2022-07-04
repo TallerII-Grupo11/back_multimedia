@@ -38,7 +38,6 @@ async def create_playlist(
 @router.get(
     "/playlists",
     response_description="List all Playlists",
-    response_model=List[PlaylistModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_playlists(
@@ -63,7 +62,6 @@ async def list_playlists(
 @router.get(
     "/playlists/{id}",
     response_description="Get a single Playlist",
-    response_model=PlaylistModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_playlist(id: str, db: DatabaseManager = Depends(get_database)):
