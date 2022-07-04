@@ -14,6 +14,9 @@ class PlaylistModel(BaseModel):
     is_collaborative: bool = Field(...)
     owner_id: str = Field(...)
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True

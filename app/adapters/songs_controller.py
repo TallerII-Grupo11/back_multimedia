@@ -6,7 +6,10 @@ from app.db.model.song import SongModel, UpdateSongModel
 from app.rest import get_restclient_metrics
 from app.rest.metric_client import MetricClient
 from typing import List
-
+from bson import json_util
+from fastapi.encoders import jsonable_encoder
+import json
+import logging
 
 router = APIRouter(tags=["songs"])
 
@@ -14,7 +17,6 @@ router = APIRouter(tags=["songs"])
 @router.post(
     "/songs",
     response_description="Add new song",
-    response_model=SongModel
 )
 async def create_song(
     song: SongModel = Body(...),
@@ -24,20 +26,25 @@ async def create_song(
     manager = SongManager(db.db)
     rest_metric.post_new_song(song)
     created_song = await manager.add_song(song)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_song)
+    song_json = json.loads(json_util.dumps(created_song))
+    song_json["id"] = song_json["_id"]
+    del song_json["_id"]
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=song_json)
 
 
 @router.get(
     "/songs/{id}",
     response_description="Get a single song",
-    response_model=UpdateSongModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
     manager = SongManager(db.db)
     try:
         song = await manager.get_song(song_id=id)
-        return song
+        song_json = json.loads(json_util.dumps(song))
+        song_json["id"] = song_json["_id"]
+        del song_json["_id"]
+        return song_json
     except Exception as e:
         raise HTTPException(status_code=404, detail=e)
 
@@ -45,7 +52,6 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 @router.get(
     "/songs",
     response_description="List all songs in by artist or genre",
-    response_model=List[SongModel],
     status_code=status.HTTP_200_OK,
 )
 async def list_songs_by(
@@ -54,11 +60,21 @@ async def list_songs_by(
     db: DatabaseManager = Depends(get_database)
 ):
     manager = SongManager(db.db)
+    list_songs = []
     if artist_name:
-        return await manager.list_songs_by_artist(artist_name)
+        list_songs = await manager.list_songs_by_artist(artist_name)
     if genre:
-        return await manager.list_songs_by_genre(genre)
-    return await manager.get_songs()
+        list_songs = await manager.list_songs_by_genre(genre)
+    else:
+        list_songs = await manager.get_songs()
+
+    songss = []
+    for song in list_songs:
+        song_json = jsonable_encoder(song)
+        song_json["id"] = song_json["_id"]
+        del song_json["_id"]
+        songss.append(song_json)
+    return songss
 
 
 @router.put(
@@ -73,4 +89,7 @@ async def update_song(
 ):
     manager = SongManager(db.db)
     song = await manager.update_song(song_id=id, song=song)
-    return JSONResponse(song, status_code=status.HTTP_200_OK)
+    song_json = json.loads(json_util.dumps(song))
+    song_json["id"] = song_json["_id"]
+    del song_json["_id"]
+    return JSONResponse(song_json, status_code=status.HTTP_200_OK)

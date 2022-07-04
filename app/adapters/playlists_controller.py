@@ -4,10 +4,13 @@ from typing import List
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel, SongPlaylistModel
+from app.db.model.playlist import PlaylistModel, UpdatePlaylistModel
 from app.db.impl.playlist_manager import PlaylistManager
 from app.rest.metric_client import MetricClient
 from app.rest import get_restclient_metrics
+from bson import json_util
+import json
+from fastapi.encoders import jsonable_encoder
 
 
 router = APIRouter(tags=["playlist"])
@@ -26,7 +29,10 @@ async def create_playlist(
     manager = PlaylistManager(db.db)
     rest_metric.post_new_playlist(playlist)
     created_playlist = await manager.add_playlist(playlist)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_playlist)
+    playlist_json = json.loads(json_util.dumps(created_playlist))
+    playlist_json["id"] = playlist_json["_id"]
+    del playlist_json["_id"]
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=playlist_json)
 
 
 @router.get(
@@ -40,10 +46,19 @@ async def list_playlists(
     db: DatabaseManager = Depends(get_database)
 ):
     manager = PlaylistManager(db.db)
+    list_playlist = []
     if user_id:
-        return await manager.get_playlists(user_id)
-    return await manager.get_playlists()
+        list_playlist = await manager.get_playlists(user_id)
+    else:
+        list_playlist = await manager.get_playlists()
 
+    playlists = []
+    for playlist in list_playlist:
+        playlist_json = jsonable_encoder(playlist)
+        playlist_json["id"] = playlist_json["_id"]
+        del playlist_json["_id"]
+        playlists.append(playlist_json)
+    return playlists
 
 @router.get(
     "/playlists/{id}",
@@ -55,7 +70,10 @@ async def show_playlist(id: str, db: DatabaseManager = Depends(get_database)):
     manager = PlaylistManager(db.db)
     playlist = await manager.get_playlist(playlist_id=id)
     if playlist is not None:
-        return playlist
+        playlist_json = json.loads(json_util.dumps(playlist))
+        playlist_json["id"] = playlist_json["_id"]
+        del playlist_json["_id"]
+        return playlist_json
 
     raise HTTPException(status_code=404, detail=f"Playlist {id} not found")
 
@@ -73,7 +91,10 @@ async def update_playlist(
     manager = PlaylistManager(db.db)
     try:
         playlist = await manager.update_playlist(playlist_id=id, playlist=playlist)
-        return playlist
+        playlist_json = json.loads(json_util.dumps(playlist))
+        playlist_json["id"] = playlist_json["_id"]
+        del playlist_json["_id"]
+        return playlist_json
     except Exception as e:
         raise HTTPException(status_code=404, detail=e)
 
@@ -92,21 +113,3 @@ async def delete_playlist(id: str, db: DatabaseManager = Depends(get_database)):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Playlist {id} not found")
-
-
-@router.patch(
-    "/playlists/{id}/songs",
-    response_description="Add songs to playlist",
-    status_code=status.HTTP_200_OK,
-)
-async def add_song_to_playlist(
-    id: str,
-    playlist: SongPlaylistModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
-):
-    manager = PlaylistManager(db.db)
-    try:
-        playlist = await manager.add_song(playlist_id=id, playlist=playlist)
-        return playlist
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=e)
