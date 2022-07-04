@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status, Depends, Body, HTTPException
 
-from typing import List
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
@@ -58,6 +57,7 @@ async def list_playlists(
         del playlist_json["_id"]
         playlists.append(playlist_json)
     return playlists
+
 
 @router.get(
     "/playlists/{id}",

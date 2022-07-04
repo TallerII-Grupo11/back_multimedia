@@ -54,7 +54,7 @@ async def list_albums(
     if artist_name:
         list_albums = await manager.get_albums_by_artist(artist_name)
     if genre:
-        list_albums =  await manager.get_albums_by_genre(genre)
+        list_albums = await manager.get_albums_by_genre(genre)
     if song_id:
         album = await manager.get_albums_by_song(song_id)
         if album:

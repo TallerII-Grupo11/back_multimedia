@@ -5,11 +5,10 @@ from app.db.impl.song_manager import SongManager
 from app.db.model.song import SongModel, UpdateSongModel
 from app.rest import get_restclient_metrics
 from app.rest.metric_client import MetricClient
-from typing import List
 from bson import json_util
 from fastapi.encoders import jsonable_encoder
 import json
-import logging
+
 
 router = APIRouter(tags=["songs"])
 
