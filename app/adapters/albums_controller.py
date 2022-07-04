@@ -3,10 +3,13 @@ from fastapi import APIRouter, status, Depends, Body, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel
 from app.db.impl.album_manager import AlbumManager
 from app.rest.metric_client import MetricClient
 from app.rest import get_restclient_metrics
+from bson import json_util
+import json
+from fastapi.encoders import jsonable_encoder
 
 
 router = APIRouter(tags=["albums"])
@@ -25,7 +28,10 @@ async def create_album(
     manager = AlbumManager(db.db)
     rest_metric.post_new_album(album)
     created_album = await manager.add_album(album)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_album)
+    album_json = json.loads(json_util.dumps(created_album))
+    album_json["id"] = album_json["_id"]
+    del album_json["_id"]
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=album_json)
 
 
 @router.get(
@@ -42,35 +48,47 @@ async def list_albums(
     db: DatabaseManager = Depends(get_database)
 ):
     manager = AlbumManager(db.db)
+    list_albums = []
     if subscription:
-        return await manager.get_albums_by_subscription(subscription)
+        list_albums = await manager.get_albums_by_subscription(subscription)
     if artist_name:
-        return await manager.get_albums_by_artist(artist_name)
+        list_albums = await manager.get_albums_by_artist(artist_name)
     if genre:
-        return await manager.get_albums_by_genre(genre)
+        list_albums = await manager.get_albums_by_genre(genre)
     if song_id:
         album = await manager.get_albums_by_song(song_id)
         if album:
-            return JSONResponse(album, status_code=status.HTTP_200_OK)
+            album_json = json.loads(json_util.dumps(album))
+            album_json["id"] = album_json["_id"]
+            del album_json["_id"]
+            return JSONResponse(album_json, status_code=status.HTTP_200_OK)
         raise HTTPException(
             status_code=400, detail=f"Album for song {song_id} NOT_FOUND"
         )
 
-    albums = await manager.get_albums()
-    return albums
+    list_albums = await manager.get_albums()
+    albumss = []
+    for album in list_albums:
+        album_json = jsonable_encoder(album)
+        album_json["id"] = album_json["_id"]
+        del album_json["_id"]
+        albumss.append(album_json)
+    return albumss
 
 
 @router.get(
     "/albums/{id}",
     response_description="Get a single album",
-    response_model=UpdateAlbumModel,
     status_code=status.HTTP_200_OK,
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
     manager = AlbumManager(db.db)
     album = await manager.get_album(album_id=id)
     if album is not None:
-        return album
+        album_json = json.loads(json_util.dumps(album))
+        album_json["id"] = album_json["_id"]
+        del album_json["_id"]
+        return album_json
 
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
 
@@ -88,21 +106,9 @@ async def update_album(
     manager = AlbumManager(db.db)
     try:
         album = await manager.update_album(album_id=id, album=album)
-        return JSONResponse(album, status_code=status.HTTP_200_OK)
+        album_json = json.loads(json_util.dumps(album))
+        album_json["id"] = album_json["_id"]
+        del album_json["_id"]
+        return JSONResponse(album_json, status_code=status.HTTP_200_OK)
     except Exception as e:
         raise HTTPException(status_code=404, detail=e)
-
-
-@router.patch(
-    "/albums/{id}/songs",
-    response_description="Add songs to album",
-    status_code=status.HTTP_200_OK,
-)
-async def add_song_to_album(
-    id: str,
-    album: SongAlbumModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
-):
-    manager = AlbumManager(db.db)
-    album = await manager.add_song(album_id=id, album=album)
-    return JSONResponse(album, status_code=status.HTTP_200_OK)

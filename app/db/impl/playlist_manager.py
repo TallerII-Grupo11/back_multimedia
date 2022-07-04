@@ -22,7 +22,7 @@ class PlaylistManager():
         if not user_id:
             playlist_q = self.db["playlists"].find()
         else:
-            playlist_q = self.db["playlists"].find({"user_owner": user_id})
+            playlist_q = self.db["playlists"].find({"owner_id": user_id})
 
         async for playlist in playlist_q:
             playlist_list.append(PlaylistModel(**playlist))

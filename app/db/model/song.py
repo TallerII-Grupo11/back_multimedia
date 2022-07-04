@@ -43,6 +43,9 @@ class UpdateSongModel(BaseModel):
     song_file: Optional[str]
     genre: Optional[str]
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}

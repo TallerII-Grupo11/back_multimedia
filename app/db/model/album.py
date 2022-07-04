@@ -25,6 +25,9 @@ class AlbumModel(BaseModel):
             raise ValueError(f'Subscription value {v} not allowed')
         return v
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
