@@ -65,8 +65,8 @@ async def list_albums(
         raise HTTPException(
             status_code=400, detail=f"Album for song {song_id} NOT_FOUND"
         )
-
-    list_albums = await manager.get_albums()
+    if not subscription and not artist_name and not genre:
+        list_albums = await manager.get_albums()
     albumss = []
     for album in list_albums:
         album_json = jsonable_encoder(album)

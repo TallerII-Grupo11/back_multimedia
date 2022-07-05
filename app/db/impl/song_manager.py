@@ -53,7 +53,7 @@ class SongManager():
     async def list_songs_by_artist(self, artist_name: str) -> List[SongModel]:
         songs_list = []
         songs_q = self.db["songs"].find(
-            {"artists": {"$elemMatch": {"artist_name": artist_name}}}
+            {"artists.artist_name": artist_name}
         )
         async for song in songs_q:
             songs_list.append(SongModel(**song))

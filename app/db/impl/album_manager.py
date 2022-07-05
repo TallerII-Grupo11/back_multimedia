@@ -47,7 +47,7 @@ class AlbumManager():
     async def get_albums_by_artist(self, artist_name: str) -> List[AlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find(
-            {"artist": {"$elemMatch": {"artist_name": artist_name}}}
+            {"artist.artist_name": artist_name}
         )
         async for album in albums_q:
             albums_list.append(AlbumModel(**album))

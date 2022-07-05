@@ -62,7 +62,7 @@ async def list_songs_by(
     list_songs = []
     if artist_name:
         list_songs = await manager.list_songs_by_artist(artist_name)
-    if genre:
+    elif genre:
         list_songs = await manager.list_songs_by_genre(genre)
     else:
         list_songs = await manager.get_songs()
