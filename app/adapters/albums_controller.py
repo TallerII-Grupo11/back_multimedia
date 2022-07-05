@@ -3,7 +3,7 @@ from fastapi import APIRouter, status, Depends, Body, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.db import DatabaseManager, get_database
-from app.db.model.album import AlbumModel, UpdateAlbumModel
+from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
 from app.db.impl.album_manager import AlbumManager
 from app.rest.metric_client import MetricClient
 from app.rest import get_restclient_metrics
@@ -112,3 +112,18 @@ async def update_album(
         return JSONResponse(album_json, status_code=status.HTTP_200_OK)
     except Exception as e:
         raise HTTPException(status_code=404, detail=e)
+
+
+@router.patch(
+    "/albums/{id}/songs",
+    response_description="Add songs to album",
+    status_code=status.HTTP_200_OK,
+)
+async def add_song_to_album(
+    id: str,
+    album: SongAlbumModel = Body(...),
+    db: DatabaseManager = Depends(get_database)
+):
+    manager = AlbumManager(db.db)
+    album = await manager.add_song(album_id=id, album=album)
+    return JSONResponse(album, status_code=status.HTTP_200_OK)
