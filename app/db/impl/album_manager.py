@@ -9,7 +9,7 @@ from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
 
-class AlbumManager():
+class AlbumManager:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
 
@@ -30,9 +30,7 @@ class AlbumManager():
         return album
 
     async def update_album(
-        self,
-        album_id: str,
-        album: UpdateAlbumModel = Body(...)
+        self, album_id: str, album: UpdateAlbumModel = Body(...)
     ) -> AlbumModel:
         try:
             album = {k: v for k, v in album.dict().items() if v is not None}
@@ -46,17 +44,12 @@ class AlbumManager():
 
     async def get_albums_by_artist(self, artist_name: str) -> List[AlbumModel]:
         albums_list = []
-        albums_q = self.db["albums"].find(
-            {"artist.artist_name": artist_name}
-        )
+        albums_q = self.db["albums"].find({"artist.artist_name": artist_name})
         async for album in albums_q:
             albums_list.append(AlbumModel(**album))
         return albums_list
 
-    async def get_albums_by_subscription(
-        self,
-        subscription: str
-    ) -> List[AlbumModel]:
+    async def get_albums_by_subscription(self, subscription: str) -> List[AlbumModel]:
         albums_list = []
         albums_q = self.db["albums"].find(
             {"subscription": {"$in": Subscription.get_allowed(subscription)}}
@@ -73,18 +66,15 @@ class AlbumManager():
         return albums_list
 
     async def add_song(
-        self,
-        album_id: str,
-        album: SongAlbumModel = Body(...)
+        self, album_id: str, album: SongAlbumModel = Body(...)
     ) -> AlbumModel:
         try:
             album = {k: v for k, v in album.dict().items() if v is not None}
             if "songs" in album:
                 list_songs = album["songs"]
-                await self.db["albums"]\
-                    .update_one({"_id": album_id},
-                                {"$push": {"songs": {"$each": list_songs}}}
-                                )
+                await self.db["albums"].update_one(
+                    {"_id": album_id}, {"$push": {"songs": {"$each": list_songs}}}
+                )
             album_model = await self.get_album(album_id)
             return album_model
         except Exception as e:
@@ -93,7 +83,5 @@ class AlbumManager():
             raise RuntimeError(msg)
 
     async def get_albums_by_song(self, song_id: str) -> AlbumModel:
-        albums_q = await self.db["albums"].find_one(
-            {"songs": song_id}
-        )
+        albums_q = await self.db["albums"].find_one({"songs": song_id})
         return albums_q

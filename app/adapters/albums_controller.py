@@ -8,7 +8,7 @@ from app.db.impl.album_manager import AlbumManager
 from app.db.impl.song_manager import SongManager
 from app.rest.metric_client import MetricClient
 from app.rest import get_restclient_metrics
-from app.adapters.utils.utils import *
+from app.adapters.utils.utils import get_data, get_list
 from bson import json_util
 import json
 from fastapi.encoders import jsonable_encoder
@@ -47,7 +47,7 @@ async def list_albums(
     artist_name: str = None,
     song_id: str = None,
     genre: str = None,
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = AlbumManager(db.db)
     manager_song = SongManager(db.db)
@@ -72,7 +72,6 @@ async def list_albums(
         )
     if not subscription and not artist_name and not genre:
         list_albums = await manager.get_albums()
-
 
     albumss = []
     for album in list_albums:
@@ -116,7 +115,7 @@ async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
 async def update_album(
     id: str,
     album: UpdateAlbumModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = AlbumManager(db.db)
     try:
@@ -137,7 +136,7 @@ async def update_album(
 async def add_song_to_album(
     id: str,
     album: SongAlbumModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = AlbumManager(db.db)
     album = await manager.add_song(album_id=id, album=album)

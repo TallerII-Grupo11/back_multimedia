@@ -8,11 +8,11 @@ from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
 
-class SongManager():
+class SongManager:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
 
-    async def get_songs(self) -> List[SongModel]:
+    async def get_all_songs(self) -> List[SongModel]:
         songs_list = []
         songs_q = self.db["songs"].find()
         async for song in songs_q:
@@ -29,9 +29,7 @@ class SongManager():
         return delete_result
 
     async def update_song(
-        self,
-        song_id: str,
-        song: UpdateSongModel = Body(...)
+        self, song_id: str, song: UpdateSongModel = Body(...)
     ) -> SongModel:
         song = {k: v for k, v in song.dict().items() if v is not None}
 
@@ -52,9 +50,7 @@ class SongManager():
 
     async def list_songs_by_artist(self, artist_name: str) -> List[SongModel]:
         songs_list = []
-        songs_q = self.db["songs"].find(
-            {"artists.artist_name": artist_name}
-        )
+        songs_q = self.db["songs"].find({"artists.artist_name": artist_name})
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list
