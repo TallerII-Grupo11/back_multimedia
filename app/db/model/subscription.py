@@ -14,4 +14,4 @@ class Subscription(str, Enum):
             return ["free", "normal"]
         if (subscription == "free"):
             return ["free"]
-        return ""
+        return [""]
