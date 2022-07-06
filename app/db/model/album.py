@@ -43,7 +43,7 @@ class AlbumModel(BaseModel):
                 "genre": "rock",
                 "image": "image.png",
                 "subscription": "free",
-                "songs": ["song_id_1", "song_id_2"]
+                "songs": ["song_id_1", "song_id_2"],
             }
         }
 
@@ -71,7 +71,7 @@ class UpdateAlbumModel(BaseModel):
                 "genre": "rock",
                 "image": "image.png",
                 "subscription": "free",
-                "songs": ["song_id_1", "song_id_2"]
+                "songs": ["song_id_1", "song_id_2"],
             }
         }
 
@@ -82,8 +82,4 @@ class SongAlbumModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "songs": ["song_id_1", "song_id_2"]
-            }
-        }
+        schema_extra = {"example": {"songs": ["song_id_1", "song_id_2"]}}

@@ -8,7 +8,7 @@ from fastapi import Body
 from fastapi.encoders import jsonable_encoder
 
 
-class PlaylistManager():
+class PlaylistManager:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
 
@@ -37,17 +37,15 @@ class PlaylistManager():
         return delete_result
 
     async def update_playlist(
-        self,
-        playlist_id: str,
-        playlist: UpdatePlaylistModel = Body(...)
+        self, playlist_id: str, playlist: UpdatePlaylistModel = Body(...)
     ) -> PlaylistModel:
         try:
             playlist = {k: v for k, v in playlist.dict().items() if v is not None}
             available = await self.check_update_available(playlist_id, playlist)
             if available:
-                await self.db["playlists"].update_one({"_id": playlist_id},
-                                                      {"$set": playlist}
-                                                      )
+                await self.db["playlists"].update_one(
+                    {"_id": playlist_id}, {"$set": playlist}
+                )
             playlist_model = await self.get_playlist(playlist_id)
             return playlist_model
         except Exception as e:
@@ -55,34 +53,30 @@ class PlaylistManager():
             return e
 
     async def add_song(
-        self,
-        playlist_id: str,
-        playlist: SongPlaylistModel = Body(...)
+        self, playlist_id: str, playlist: SongPlaylistModel = Body(...)
     ) -> PlaylistModel:
         try:
             playlist = {k: v for k, v in playlist.dict().items() if v is not None}
             available = await self.check_update_available(playlist_id, playlist)
             if available and "songs" in playlist:
-                await self.db["playlists"]\
-                        .update_one({"_id": playlist_id},
-                                    {"$push": {"songs": {"$each": playlist["songs"]}}}
-                                    )
+                await self.db["playlists"].update_one(
+                    {"_id": playlist_id},
+                    {"$push": {"songs": {"$each": playlist["songs"]}}},
+                )
             playlist_model = await self.get_playlist(playlist_id)
             return playlist_model
         except Exception as e:
             logging.info(f"{e}")
             return e
 
-    async def check_update_available(
-        self,
-        playlist_id: str,
-        playlist: dict
-    ) -> bool:
+    async def check_update_available(self, playlist_id: str, playlist: dict) -> bool:
         playlist_to_update = await self.get_playlist(playlist_id)
         playlist_to_update = jsonable_encoder(playlist_to_update)
 
-        if not (playlist["owner_id"] == playlist_to_update["owner_id"] or
-                playlist_to_update["is_collaborative"]):
+        if not (
+            playlist["owner_id"] == playlist_to_update["owner_id"]
+            or playlist_to_update["is_collaborative"]
+        ):
             msg = f"User {playlist['owner_id']} can't edit playlist {playlist_id}"
             logging.error(msg)
             raise RuntimeError(msg)

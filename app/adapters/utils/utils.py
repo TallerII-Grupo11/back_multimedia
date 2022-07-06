@@ -2,6 +2,7 @@ from bson import json_util
 import json
 from fastapi.encoders import jsonable_encoder
 
+
 def get_list(list_data):
     data = []
     for x in list_data:
@@ -17,4 +18,3 @@ def get_data(data):
     data_json["id"] = data_json["_id"]
     del data_json["_id"]
     return data_json
-

@@ -56,7 +56,7 @@ async def show_song(id: str, db: DatabaseManager = Depends(get_database)):
 async def list_songs_by(
     artist_name: str = None,
     genre: str = None,
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = SongManager(db.db)
     list_songs = []
@@ -65,7 +65,7 @@ async def list_songs_by(
     elif genre:
         list_songs = await manager.list_songs_by_genre(genre)
     else:
-        list_songs = await manager.get_songs()
+        list_songs = await manager.get_all_songs()
 
     songss = []
     for song in list_songs:
@@ -84,7 +84,7 @@ async def list_songs_by(
 async def update_song(
     id: str,
     song: UpdateSongModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = SongManager(db.db)
     song = await manager.update_song(song_id=id, song=song)

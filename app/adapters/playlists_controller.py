@@ -40,8 +40,7 @@ async def create_playlist(
     status_code=status.HTTP_200_OK,
 )
 async def list_playlists(
-    user_id: str = None,
-    db: DatabaseManager = Depends(get_database)
+    user_id: str = None, db: DatabaseManager = Depends(get_database)
 ):
     manager = PlaylistManager(db.db)
     list_playlist = []
@@ -84,7 +83,7 @@ async def show_playlist(id: str, db: DatabaseManager = Depends(get_database)):
 async def update_playlist(
     id: str,
     playlist: UpdatePlaylistModel = Body(...),
-    db: DatabaseManager = Depends(get_database)
+    db: DatabaseManager = Depends(get_database),
 ):
     manager = PlaylistManager(db.db)
     try:

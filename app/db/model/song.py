@@ -31,7 +31,7 @@ class SongModel(BaseModel):
                 ],
                 "description": "Song",
                 "song_file": "file_name",
-                "genre": "genre_name"
+                "genre": "genre_name",
             }
         }
 
@@ -60,6 +60,6 @@ class UpdateSongModel(BaseModel):
                 ],
                 "description": "Song",
                 "song_file": "file_name",
-                "genre": "genre_name"
+                "genre": "genre_name",
             }
         }
