@@ -65,3 +65,10 @@ class SongManager():
         async for song in songs_q:
             songs_list.append(SongModel(**song))
         return songs_list
+
+    async def get_songs(self, list_songs):
+        songs_list = []
+        songs_q = self.db["songs"].find({"_id": {"$in": list_songs}})
+        async for song in songs_q:
+            songs_list.append(SongModel(**song))
+        return songs_list

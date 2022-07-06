@@ -5,8 +5,10 @@ from fastapi.responses import JSONResponse
 from app.db import DatabaseManager, get_database
 from app.db.model.album import AlbumModel, UpdateAlbumModel, SongAlbumModel
 from app.db.impl.album_manager import AlbumManager
+from app.db.impl.song_manager import SongManager
 from app.rest.metric_client import MetricClient
 from app.rest import get_restclient_metrics
+from app.adapters.utils.utils import *
 from bson import json_util
 import json
 from fastapi.encoders import jsonable_encoder
@@ -48,6 +50,7 @@ async def list_albums(
     db: DatabaseManager = Depends(get_database)
 ):
     manager = AlbumManager(db.db)
+    manager_song = SongManager(db.db)
     list_albums = []
     if subscription:
         list_albums = await manager.get_albums_by_subscription(subscription)
@@ -58,20 +61,29 @@ async def list_albums(
     if song_id:
         album = await manager.get_albums_by_song(song_id)
         if album:
-            album_json = json.loads(json_util.dumps(album))
-            album_json["id"] = album_json["_id"]
-            del album_json["_id"]
+            album_json = get_data(album)
+            songs = await manager_song.get_songs(album_json["songs"])
+            list_songs = get_list(songs)
+            del album_json["songs"]
+            album_json["songs"] = list_songs
             return JSONResponse(album_json, status_code=status.HTTP_200_OK)
         raise HTTPException(
             status_code=400, detail=f"Album for song {song_id} NOT_FOUND"
         )
     if not subscription and not artist_name and not genre:
         list_albums = await manager.get_albums()
+
+
     albumss = []
     for album in list_albums:
         album_json = jsonable_encoder(album)
         album_json["id"] = album_json["_id"]
         del album_json["_id"]
+
+        songs = await manager_song.get_songs(album_json["songs"])
+        list_songs = get_list(songs)
+        del album_json["songs"]
+        album_json["songs"] = list_songs
         albumss.append(album_json)
     return albumss
 
@@ -83,11 +95,14 @@ async def list_albums(
 )
 async def show_album(id: str, db: DatabaseManager = Depends(get_database)):
     manager = AlbumManager(db.db)
+    manager_song = SongManager(db.db)
     album = await manager.get_album(album_id=id)
     if album is not None:
-        album_json = json.loads(json_util.dumps(album))
-        album_json["id"] = album_json["_id"]
-        del album_json["_id"]
+        album_json = get_data(album)
+        songs = await manager_song.get_songs(album_json["songs"])
+        list_songs = get_list(songs)
+        del album_json["songs"]
+        album_json["songs"] = list_songs
         return album_json
 
     raise HTTPException(status_code=404, detail=f"Album {id} not found")
